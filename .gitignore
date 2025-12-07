@@ -38,3 +38,8 @@ node_modules/
 /ml/*.joblib
 /ml/venv/
 /ml/.pytest_cache/
+
+# Docker
+docker-compose.override.yml
+.docker/
+*.dockerignore
