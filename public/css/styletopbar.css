@@ -1,0 +1,208 @@
+/* -------------  STYLETOPBAR.CSS  ------------- */
+/* ==============   TOP BAR   ================== */
+.topbar-clean{
+  background:#fff;
+  border-bottom:1px solid #e5e9f2;
+  height:64px;
+  display:flex;
+  align-items:center;
+  padding:0 1.25rem;
+  z-index:1100;
+
+  /* alineación con el contenido principal */
+  position:sticky; top:0;
+  left:240px;
+  width:calc(100% - 240px);
+
+  flex-wrap:nowrap;
+  overflow:visible;
+}
+
+/* sidebar contraído (56 px) */
+body.sidebar-toggled .topbar-clean{
+  left:56px;
+  width:calc(100% - 56px);
+}
+
+/* ------- Buscador -------------------------------------------------- */
+.search-wrapper{
+  position:relative;
+  margin-right:1rem;
+  flex:1 1 260px;       /* crece/encoge (máx 260, mín 140) */
+  max-width:260px;
+  min-width:140px;
+}
+.search-wrapper input{
+  width:100%;
+  background:#f1f3f9;
+  border:0;
+  border-radius:6px;
+  padding:10px 44px 10px 16px;
+  font-size:.9rem;
+}
+.search-wrapper .search-icon{
+  position:absolute;
+  top:50%; right:14px;
+  transform:translateY(-50%);
+  color:#97a3b9;
+  font-size:.9rem;
+}
+
+/* ------- Botones de icono ------------------------------------------ */
+.icon-btn{
+  position:relative;
+  display:inline-block;
+  font-size:1.15rem;
+  color:#697386;
+}
+.icon-btn:hover{
+  color:#4460f1;
+  text-decoration:none;
+}
+
+/* badge rojo de notificaciones */
+.badge-pill-notif{
+  position:absolute;
+  top:-4px; right:-4px;
+  background:#e02d2d;
+  color:#fff;
+  font-size:.65rem;
+  font-weight:600;
+  border-radius:50%;
+  padding:2px 5px;
+}
+
+/* ------- Menús desplegables (campana / avatar) --------------------- */
+.topbar-clean .nav-item.dropdown{position:relative;}
+.topbar-clean .nav-item.dropdown .dropdown-menu{
+  position:absolute;
+  right:0;
+  top:calc(100% + 6px);
+  transform:none !important;   /* anula la traslación de Bootstrap */
+}
+/* flechita decorativa */
+.topbar-clean .nav-item.dropdown .dropdown-menu::before{
+  content:'';
+  position:absolute;
+  top:-6px;
+  right:14px;
+  border:6px solid transparent;
+  border-bottom-color:#fff;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.04));
+}
+
+/* ------- Avatar / user-menu --------------------------------------- */
+.user-dropdown{
+  width:220px;
+  border:0;
+  border-radius:12px;
+  box-shadow:0 6px 24px rgba(0,0,0,.08);
+  padding:0;
+  z-index:1200;
+}
+.user-dropdown .dropdown-header{
+  font-size:.82rem;
+  font-weight:600;
+  padding:16px 20px;
+  border-bottom:1px solid #e5e9f2;
+}
+.user-dropdown .dropdown-header small{
+  font-weight:400;
+  color:#97a3b9;
+}
+.user-dropdown .dropdown-item{
+  font-size:.85rem;
+  padding:10px 20px;
+}
+.user-dropdown .dropdown-item i{
+  width:18px;
+  margin-right:6px;
+  color:#697386;
+}
+.user-dropdown .dropdown-divider{margin:0;}
+
+/* avatar circular */
+.avatar-sm{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  object-fit:cover;
+}
+
+/* garantiza una sola línea de íconos en la derecha */
+.topbar-clean .navbar-nav{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  margin-bottom:0;
+}
+.topbar-clean .navbar-nav .nav-link{padding:0 0.75rem;}
+
+/* ===========   NOTIFICATION DROPDOWN “ALERTS CENTER”  ============= */
+/* contenedor principal */
+.notif-dropdown{
+  width:360px;
+  border:0;
+  border-radius:12px;
+  box-shadow:0 8px 32px rgba(0,0,0,.12);
+  padding:0;
+  overflow:hidden;
+  z-index:1200;
+}
+/* cabecera azul */
+.notif-dropdown .dropdown-header{
+  background:#0165ff;
+  color:#fff;
+  font-weight:600;
+  font-size:.8rem;
+  padding:14px 20px;
+  border:0;
+}
+/* zona desplazable */
+#notifDropdown,         /* id usado en JS */
+.notif-scroll{          /* alias por compatibilidad */
+  max-height:320px;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
+/* scroll oculto hasta hover */
+#notifDropdown::-webkit-scrollbar,
+.notif-scroll::-webkit-scrollbar{width:0;}
+#notifDropdown:hover::-webkit-scrollbar,
+.notif-scroll:hover::-webkit-scrollbar{width:8px;}
+#notifDropdown:hover::-webkit-scrollbar-thumb,
+.notif-scroll:hover::-webkit-scrollbar-thumb{
+  background:#c4c9d1;
+  border-radius:4px;
+}
+
+/* ítem individual */
+.notif-item{
+  display:flex;
+  gap:12px;
+  padding:14px 20px;
+  border-bottom:1px solid #f1f3f7;
+  font-size:.82rem;
+  cursor:pointer;
+}
+.notif-item:last-child{border-bottom:0;}
+.notif-item:hover{background:#f8f9fc;}
+
+/* icono circular de color */
+.notif-icon{
+  flex:0 0 36px;
+  height:36px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  font-size:1rem;
+  color:#fff;
+}
+.notif-icon.red   {background:#ff5252;}
+.notif-icon.yellow{background:#ffb400;}
+.notif-icon.green {background:#37c36a;}
+.notif-icon.blue  {background:#3388ff;}
+
+/* texto y fecha */
+.notif-date{font-size:.7rem;color:#8f96a2;margin-bottom:2px;}
+.notif-text{line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}

@@ -1,0 +1,17 @@
+introduccion:::Bienvenido al Centro de Soporte de VisApp hebert
+ayuda-texto:::Si no encuentras lo que buscas, no dudes en contactar a nuestro equipo de soporte técnico.
+que-es-visa:::¿Qué es una visa?
+que-es-visa-texto:::Una visa es un documento que permite la entrada a un país por un período específico y para un propósito particular.
+como-solicitar:::¿Cómo solicitar una visa?
+como-solicitar-texto:::Puedes solicitar una visa a través de nuestra plataforma.  "Ingresar Usuario" y sigue las instrucciones.
+cuanto-tiempo:::¿Cuánto tiempo tarda?
+cuanto-tiempo-texto:::El tiempo de procesamiento varía, pero generalmente toma entre 5 a 10 días hábiles.
+faq1-pregunta:::¿Cómo puedo verificar el estado de mi visa?
+faq1-respuesta:::Puedes verificar el estado de tu visa navegando a "Lista Usuarios" y buscando tu nombre en la lista. La tabla mostrará los días restantes de tu visa.
+faq2-pregunta:::¿Qué debo hacer si mi visa está a punto de expirar?
+faq2-respuesta:::Si tu visa está a punto de expirar, te recomendamos que contactes a las autoridades de inmigración para renovarla. También puedes usar nuestra plataforma para gestionar la renovación.
+faq3-pregunta:::¿Cómo puedo contactar al soporte técnico?
+faq3-respuesta:::Puedes contactar al soporte técnico enviando un correo a soporte@visapp.com o llamando al +51 936811144.
+sostenibilidad-pregunta:::¿Qué es la sostenibilidad en el contexto de visas?
+sostenibilidad-respuesta:::La sostenibilidad en el contexto de visas se refiere a prácticas que aseguran que el proceso de solicitud y gestión de visas sea eficiente y respetuoso con el medio ambiente.
+footer:::Copyright © VisApp 2025

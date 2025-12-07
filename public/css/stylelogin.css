@@ -1,0 +1,298 @@
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      /* Evita el scroll horizontal */
+      overflow-y: hidden;
+      /* Elimina el scroll vertical */
+    }
+
+    body {
+      color: #000;
+      background-color: #B0BEC5;
+      background-repeat: no-repeat;
+      display: flex;
+      /* Usamos flexbox para centrar y expandir el contenido principal */
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Contenedor principal que ahora ocupará todo el espacio disponible */
+    .container-fluid {
+      flex-grow: 1;
+      /* Permite que el contenedor crezca y ocupe el espacio */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0 !important;
+      /* Eliminamos el padding para que ocupe todo el borde */
+    }
+
+    .card0 {
+      box-shadow: 0px 4px 8px 0px #757575;
+      border-radius: 0px;
+      width: 100%;
+      /* Ocupa el 100% del ancho del container-fluid */
+      height: 100vh;
+      /* Ocupa el 100% del alto del viewport */
+      display: flex;
+      /* Para flexbox interno en las columnas */
+      flex-direction: column;
+      /* Para que el footer quede abajo */
+    }
+
+    .card0 .row.d-flex {
+      flex-grow: 1;
+      /* Las columnas de login y ilustración crecen para ocupar el espacio */
+      height: 100%;
+      /* Asegura que la fila ocupe el alto disponible */
+      margin-left: 0;
+      margin-right: 0;
+      /* Evita márgenes laterales extra */
+    }
+
+    .card1,
+    .card2 {
+      display: flex;
+      flex-direction: column;
+      /* Para organizar el contenido verticalmente */
+      align-items: center;
+      /* Centra el contenido horizontalmente */
+    }
+
+    /* .card1: centramos ilustración y la empujamos más a la derecha */
+    .card1 {
+      justify-content: center;
+      overflow: hidden;
+      /* Evita que la imagen desborde y genere scroll */
+      margin-right: -80px;
+      /* La movemos 80px hacia la derecha para acercarla al cuadro */
+    }
+
+    /* --------- Estilos actualizados para el “cuadro sobrepuesto” de VisApp --------- */
+    .card2 {
+      position: relative;
+      /* Para poder aplicar z-index */
+      z-index: 20;
+      /* Se sobrepone claramente sobre la ilustración */
+      background-color: #FFFFFF;
+      /* Blanco puro para que resalte */
+      border-radius: 16px;
+      /* Esquinas más redondeadas */
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+      /* Sombra más pronunciada para efecto “sobrepuesto” */
+      margin: 10px 10px;
+      /* Menor margen vertical a 10px */
+      padding: 8px 20px;
+      /* Padding interior reducido arriba/abajo a 8px */
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      /* Alineamos todo arriba */
+      width: 100%;
+      max-width: 400px;
+      /* Ancho máximo algo mayor */
+      max-height: calc(100vh - 20px);
+      /* Evita que sobrepase la altura de la ventana */
+      overflow-y: auto;
+      /* Permite scroll interno si fuese necesario */
+    }
+
+    /* --------- Logo centrado y con margen inferior reducido --------- */
+    .letras {
+      width: 220px;
+      /* Tamaño consistente */
+      height: auto;
+      margin-top: 2px;
+      /* Muy poca separación superior */
+      margin-bottom: 2px;
+      /* Muy poca separación antes de “Sign in with” */
+    }
+
+    /* --------- Ajuste de la ilustración para no generar scroll vertical --------- */
+    .image {
+      max-width: 100%;
+      /* Ocupa todo el ancho disponible */
+      max-height: 90vh;
+      /* Permitimos que ocupe mucha altura */
+      height: auto;
+      object-fit: contain;
+      /* Asegura que la imagen se vea completa */
+    }
+
+    .border-line {
+      border-right: 1px solid #EEEEEE;
+      height: 100%;
+      /* Asegura que la línea divisoria ocupe todo el alto */
+    }
+
+    /* --------- Espacios reducidos entre “Sign in with” y campos --------- */
+    .social-row {
+      margin-bottom: 8px !important;
+      /* Ajuste de espacio */
+      align-items: center;
+    }
+
+    .field-row {
+      margin-bottom: 8px;
+      /* Campos más juntos */
+    }
+
+    .checkbox-row {
+      margin-bottom: 8px;
+      /* Checkbox y enlace juntos */
+      align-items: center;
+    }
+
+    /* --------- Ajustes a los íconos sociales --------- */
+    .facebook,
+    .twitter,
+    .linkedin {
+      width: 36px;
+      /* Íconos algo más grandes */
+      height: 36px;
+      font-size: 18px;
+      padding-top: 7px;
+      text-align: center;
+    }
+
+    .facebook {
+      background-color: #3b5998;
+      color: #fff;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .twitter {
+      background-color: #1DA1F2;
+      color: #fff;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .linkedin {
+      background-color: #2867B2;
+      color: #fff;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .line {
+      height: 1px;
+      width: 45%;
+      background-color: #E0E0E0;
+      margin-top: 10px;
+    }
+
+    .or {
+      width: 10%;
+      font-weight: bold;
+    }
+
+    .text-sm {
+      font-size: 14px !important;
+    }
+
+    ::placeholder {
+      color: #BDBDBD;
+      opacity: 1;
+      font-weight: 300
+    }
+
+    :-ms-input-placeholder {
+      color: #BDBDBD;
+      font-weight: 300
+    }
+
+    ::-ms-input-placeholder {
+      color: #BDBDBD;
+      font-weight: 300
+    }
+
+    input,
+    textarea {
+      padding: 10px 12px 10px 12px;
+      border: 1px solid lightgrey;
+      border-radius: 2px;
+      margin-bottom: 5px;
+      margin-top: 2px;
+      width: 100%;
+      box-sizing: border-box;
+      color: #2C3E50;
+      font-size: 14px;
+      letter-spacing: 1px;
+    }
+
+    input:focus,
+    textarea:focus {
+      -moz-box-shadow: none !important;
+      -webkit-box-shadow: none !important;
+      box-shadow: none !important;
+      border: 1px solid #304FFE;
+      outline-width: 0;
+    }
+
+    button:focus {
+      -moz-box-shadow: none !important;
+      -webkit-box-shadow: none !important;
+      box-shadow: none !important;
+      outline-width: 0;
+    }
+
+    a {
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .btn-blue {
+      background-color: #1A237E;
+      width: 150px;
+      color: #fff;
+      border-radius: 2px;
+      margin-top: 6px;
+      /* Que el botón no quede muy separado */
+    }
+
+    .btn-blue:hover {
+      background-color: #000;
+      cursor: pointer;
+    }
+
+    .bg-blue {
+      color: #fff;
+      background-color: #1A237E;
+      width: 100%;
+      /* Asegura que el footer ocupe todo el ancho */
+      padding-top: 15px;
+      /* Ajuste del padding para el footer */
+      padding-bottom: 15px;
+    }
+
+    @media screen and (max-width: 991px) {
+      .letras {
+        width: 180px;
+        margin-bottom: 8px;
+      }
+
+      .image {
+        width: 100%;
+        max-height: 60vh;
+      }
+
+      .border-line {
+        border-right: none;
+      }
+
+      .card2 {
+        border-top: 1px solid #EEEEEE !important;
+        margin: 10px 15px;
+        padding: 15px 20px !important;
+        max-width: none;
+        max-height: none;
+        overflow: visible;
+        border-radius: 12px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+      }
+    }

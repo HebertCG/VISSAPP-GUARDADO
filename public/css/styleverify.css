@@ -1,0 +1,57 @@
+/* —— Tarjeta contenedora —— */
+.table-card{
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 4px 18px rgba(0,0,0,.07);
+  overflow:hidden;
+}
+
+/* —— Encabezados —— */
+.table-card thead{
+  background:#294264;          /* mismo tono azul del demo */
+}
+.table-card thead th{
+  color:#fff;
+  border:0;
+  font-size:.75rem;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  padding-top:18px;
+  padding-bottom:18px;
+}
+
+/* —— Filas —— */
+.table-card tbody tr{
+  border-bottom:1px solid #edf2f6;
+  transition:background .2s;
+}
+.table-card tbody tr:hover{
+  background:#f6f9fc;
+}
+
+/* —— Celda “autor” (avatar + nombre) —— */
+.author-cell{
+  display:flex;
+  align-items:center;
+  gap:.85rem;
+}
+.author-cell img.avatar{
+  width:36px;height:36px;
+  border-radius:50%;
+  object-fit:cover;
+}
+.author-cell .name{
+  font-weight:600;
+  margin:0;
+}
+.author-cell .sub{
+  font-size:.75rem;
+  color:#8b98a8;
+  margin:0;
+}
+
+/* —— Badges — colores suaves —— */
+.badge-admin       {background:#22335b;   color:#fff;}
+.badge-usuario     {background:#697386;   color:#fff;}
+.badge-invalido    {background:#ffb703;   color:#fff;}

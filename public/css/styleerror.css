@@ -1,0 +1,80 @@
+/* public/css/styleerror.css */
+
+* {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  transition: all .2s linear;
+}
+
+.page_404 {
+  min-height: 100vh;
+  padding-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: #ffffff;
+}
+
+/* Contenedor de h1 + img */
+.page_404 div {
+  position: relative;      /* para manejar z-index internos */
+  margin-bottom: 2rem;     /* espacio al párrafo */
+  line-height: 1rem;
+}
+
+/* El “404” encima de la imagen */
+.page_404 div h1 {
+  position: relative;
+  z-index: 10;             /* lo ponemos por encima */
+  text-align: center;
+  font-size: 7rem;
+  font-weight: 700;
+  color: #ff6b6b;
+  margin-bottom: 1rem;     /* separa un poco la imagen */
+}
+
+/* La imagen justo debajo */
+.page_404 div img {
+  position: relative;
+  z-index: 1;
+  width: 25rem;
+  max-width: 90%;
+  margin-top: 0;          /* sin solaparse */
+}
+
+/* Mensaje principal */
+.page_404 p {
+  margin-top: 0;          /* ya dejamos espacio en div */
+  font-size: 1.5rem;
+  font-weight: 300;
+  color: #ff6b6b;
+  text-align: center;
+}
+
+/* Subtítulo */
+.page_404 span {
+  margin-top: .5rem;
+  margin-bottom: 2rem;
+  font-size: 1.2rem;
+  color: #666;
+  display: block;
+  text-align: center;
+}
+
+/* Botón */
+.page_404 button {
+  background-color: #ff6b6b;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.page_404 button:hover {
+  background-color: #e63946;
+}

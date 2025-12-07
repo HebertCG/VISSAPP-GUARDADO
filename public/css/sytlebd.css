@@ -1,0 +1,80 @@
+/* public/css/style.css */
+
+/* 1) Fondo global degradado */
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+  }
+  
+  /* 2) Sidebar: más ancho, sombra y transición */
+  .sidebar {
+    width: 220px;
+    transition: width .3s ease;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+  }
+  body.sidebar-toggled .sidebar {
+    width: 56px;
+  }
+  
+  /* Logo y marca */
+  .sidebar .sidebar-brand {
+    height: 70px;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  
+  /* Links del sidebar: iconos centrados y texto animado */
+  .sidebar .nav-item .nav-link {
+    padding: 1rem;
+    transition: background .2s, color .2s;
+  }
+  .sidebar .nav-item .nav-link:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+  }
+  
+  /* Topbar: limpiar fondo y añadir sombra suave */
+  .topbar {
+    background: #fff;
+    border-bottom: 1px solid #e3e6f0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  
+  /* Tarjetas: bordes redondeados, sombra y contenido centrado */
+  .card {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+  }
+  .card .card-body {
+    text-align: center;
+  }
+  
+  /* Iconos grandes dentro de la card */
+  .card .card-body i {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Botones dentro de las cards: full width y bordes redondeados */
+  .card .btn {
+    width: 100%;
+    border-radius: 0.5rem;
+    font-weight: 600;
+  }
+  
+  /* Footer minimalista */
+  footer.sticky-footer {
+    background: transparent;
+    padding: 1rem 0;
+    font-size: 0.9rem;
+    color: #fff;
+  }
+  
+  /* Ajustes responsive */
+  @media (max-width: 768px) {
+    .sidebar { width: 56px; }
+    .sidebar .sidebar-brand-text { display: none; }
+    .sidebar .nav-item .nav-link span { display: none; }
+  }
+  

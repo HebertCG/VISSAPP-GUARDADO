@@ -1,0 +1,40 @@
+# Vendor dependencies
+/vendor/
+
+# Environment variables (NUNCA subir credenciales)
+.env
+
+# Logs
+*.log
+debug.log
+debug_post.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Composer
+composer.phar
+
+# Node modules (si usas npm)
+node_modules/
+
+# Docker
+.docker/
+
+# Testing
+/tests/coverage/
+.phpunit.result.cache
+
+# ML artifacts
+/ml/__pycache__/
+/ml/*.pkl
+/ml/*.joblib
+/ml/venv/
+/ml/.pytest_cache/
