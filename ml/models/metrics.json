@@ -1,0 +1,35 @@
+{
+  "accuracy": 0.9966666666666667,
+  "precision": 0.9967078189300412,
+  "recall": 0.9966666666666667,
+  "f1_score": 0.9966715541526661,
+  "confusion_matrix": [
+    [
+      67,
+      0,
+      0
+    ],
+    [
+      0,
+      152,
+      1
+    ],
+    [
+      0,
+      0,
+      80
+    ]
+  ],
+  "feature_importance": {
+    "edad": 0.006942655857517491,
+    "pais_encoded": 0.0036930229256744935,
+    "tipo_visa_encoded": 0.0018509728127693984,
+    "renovaciones_previas": 0.0013062480417291745,
+    "dias_restantes": 0.5538225493373214,
+    "dias_desde_inicio": 0.07664371332565258,
+    "porcentaje_transcurrido": 0.09585183248090595,
+    "en_ultimos_3_meses": 0.25988900521842956
+  },
+  "cv_accuracy_mean": 0.9986666666666666,
+  "cv_accuracy_std": 0.0016329931618554354
+}
