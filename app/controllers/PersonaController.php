@@ -311,8 +311,8 @@ class PersonaController
         $red = $yellow = $green = 0;
 
         foreach ($data as &$p) {
-            // Verificar que fechaFinal existe y tiene un valor válido
-            if (!isset($p['fechaFinal']) || $p['fechaFinal'] === '' || $p['fechaFinal'] === null) {
+            // Verificar que fechaFinal no sea NULL
+            if ($p['fechaFinal'] === null) {
                 $p['daysRemaining'] = 0;
                 $red++;
                 continue;
