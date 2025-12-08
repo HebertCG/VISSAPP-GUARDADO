@@ -1,326 +1,304 @@
-# Guía de Despliegue GRATUITO - VissApp v3
+# Guía de Despliegue con Ngrok - VissApp v3
 
-## 🆓 Stack 100% Gratuito
+## 🚀 Despliegue GRATIS en 5 Minutos
 
-- **Vercel**: Frontend PHP (Gratis)
-- **Supabase**: PostgreSQL (Gratis - 500MB)
-- **PythonAnywhere**: ML API (Gratis - 512MB)
-
-**Costo Total: $0/mes** 🎉
+**Ngrok** crea un túnel público a tu Docker local. 100% gratis, sin limitaciones.
 
 ---
 
-## 📋 Requisitos Previos
+## ✅ Ventajas de Ngrok
 
-- ✅ Cuenta en GitHub
-- ✅ Repositorio: https://github.com/HebertCG/VISSAPP-GUARDADO.git
-- ⏳ Crear cuentas en:
-  - [Supabase](https://supabase.com)
-  - [PythonAnywhere](https://www.pythonanywhere.com)
-  - [Vercel](https://vercel.com)
+- ✅ **100% Gratis** (plan gratuito suficiente)
+- ✅ **Sin limitaciones** de espacio, CPU, o memoria
+- ✅ **Ya tienes Docker funcionando** localmente
+- ✅ **Setup en 5 minutos**
+- ✅ **No requiere cambios** en el código
+- ✅ **HTTPS automático** (SSL gratis)
 
----
+## ⚠️ Desventajas
 
-## 🗄️ PASO 1: Configurar Supabase (Base de Datos)
-
-### 1.1 Crear Proyecto
-
-1. Ir a https://supabase.com
-2. Click en **"New Project"**
-3. Configurar:
-   - **Name**: `vissapp`
-   - **Database Password**: (guardar este password)
-   - **Region**: Closest to you
-   - **Plan**: Free
-4. Click **"Create new project"**
-5. Esperar ~2 minutos
-
-### 1.2 Ejecutar Schema SQL
-
-1. En el dashboard, ir a **"SQL Editor"**
-2. Click **"New query"**
-3. Copiar y pegar el contenido de `database/schema.sql`
-4. Click **"Run"**
-5. Verificar que se crearon las tablas
-
-### 1.3 Obtener Credenciales
-
-1. Ir a **"Settings"** → **"Database"**
-2. Copiar:
-   - **Host**: `db.xxx.supabase.co`
-   - **Database name**: `postgres`
-   - **Port**: `5432`
-   - **User**: `postgres`
-   - **Password**: (el que creaste en 1.1)
-
-**Guardar estas credenciales**, las necesitarás después.
+- ⚠️ Tu PC debe estar encendida 24/7
+- ⚠️ URL cambia cada vez que reinicias (en plan gratis)
+- ⚠️ No es tan "profesional" como hosting en la nube
 
 ---
 
-## 🐍 PASO 2: Configurar PythonAnywhere (ML API)
+## 📋 Paso 1: Instalar Ngrok
 
-### 2.1 Crear Cuenta
+### Opción A: Con Chocolatey (Recomendado)
 
-1. Ir a https://www.pythonanywhere.com
-2. Click **"Pricing & signup"** → **"Create a Beginner account"**
-3. Completar registro (100% gratis)
+```powershell
+# Instalar Chocolatey si no lo tienes
+# https://chocolatey.org/install
 
-### 2.2 Subir Código ML
-
-1. En dashboard, ir a **"Files"**
-2. Crear carpeta: `vissapp-ml`
-3. Subir archivos desde `/ml`:
-   - `app.py`
-   - `requirements.txt`
-   - `models/visa_risk_classifier.pkl`
-   - `models/metrics.json`
-
-**Alternativa (más rápido):**
-```bash
-# En PythonAnywhere Bash console
-git clone https://github.com/HebertCG/VISSAPP-GUARDADO.git
-cp -r VISSAPP-GUARDADO/ml/* vissapp-ml/
+# Instalar Ngrok
+choco install ngrok
 ```
 
-### 2.3 Instalar Dependencias
+### Opción B: Descarga Manual
 
-1. Ir a **"Consoles"** → **"Bash"**
-2. Ejecutar:
-```bash
-cd vissapp-ml
-pip3.10 install --user -r requirements.txt
-```
-3. Esperar ~5 minutos
-
-### 2.4 Configurar Web App
-
-1. Ir a **"Web"** → **"Add a new web app"**
-2. Configurar:
-   - **Python version**: 3.10
-   - **Framework**: Manual configuration
-3. En **"Code"**:
-   - **Source code**: `/home/username/vissapp-ml`
-   - **Working directory**: `/home/username/vissapp-ml`
-4. En **"WSGI configuration file"**, editar y reemplazar TODO con:
-
-```python
-import sys
-path = '/home/username/vissapp-ml'  # Cambiar 'username'
-if path not in sys.path:
-    sys.path.append(path)
-
-from app import app as application
-```
-
-5. Click **"Reload"** (botón verde arriba)
-
-### 2.5 Verificar
-
-1. Tu ML API estará en: `https://username.pythonanywhere.com`
-2. Probar: `https://username.pythonanywhere.com/health`
-3. Deberías ver:
-```json
-{
-  "status": "healthy",
-  "modelo_cargado": true,
-  "timestamp": "..."
-}
-```
-
-**Guardar esta URL**, la necesitarás para Vercel.
+1. Ir a https://ngrok.com/download
+2. Descargar para Windows
+3. Extraer `ngrok.exe` a `C:\Windows\System32\`
 
 ---
 
-## 🌐 PASO 3: Configurar Vercel (Frontend)
+## 📋 Paso 2: Crear Cuenta en Ngrok (Gratis)
 
-### 3.1 Conectar GitHub
-
-1. Ir a https://vercel.com
-2. Click **"Sign Up"** → **"Continue with GitHub"**
-3. Autorizar Vercel
-
-### 3.2 Importar Proyecto
-
-1. Click **"Add New..."** → **"Project"**
-2. Buscar `VISSAPP-GUARDADO`
-3. Click **"Import"**
-
-### 3.3 Configurar Variables de Entorno
-
-Antes de desplegar, agregar variables de entorno:
-
-1. En la página de configuración, ir a **"Environment Variables"**
-2. Agregar las siguientes:
-
-```
-DB_HOST=db.xxx.supabase.co
-DB_PORT=5432
-DB_DATABASE=postgres
-DB_USERNAME=postgres
-DB_PASSWORD=tu_password_de_supabase
-
-ML_API_URL=https://username.pythonanywhere.com
-
-MAILGUN_API_KEY=tu_mailgun_key
-MAILGUN_DOMAIN=tu_mailgun_domain
-
-TWILIO_SID=tu_twilio_sid
-TWILIO_TOKEN=tu_twilio_token
-TWILIO_FROM=+1234567890
-
-APP_ENV=production
-APP_DEBUG=false
-```
-
-3. Click **"Add"** para cada variable
-
-### 3.4 Desplegar
-
-1. Click **"Deploy"**
-2. Esperar ~3-5 minutos
-3. Una vez completado, obtendrás una URL: `https://vissapp-xxx.vercel.app`
-
-### 3.5 Verificar
-
-1. Visitar tu URL de Vercel
-2. Deberías ver la página de login
-3. Intentar login con:
-   - Usuario: `admin`
-   - Password: `admin123`
+1. Ir a https://dashboard.ngrok.com/signup
+2. Crear cuenta gratuita (con GitHub o email)
+3. Copiar tu **Authtoken**
 
 ---
 
-## ✅ Verificación Completa
+## 📋 Paso 3: Configurar Authtoken
 
-### Checklist:
+```powershell
+# Configurar tu authtoken (solo una vez)
+ngrok config add-authtoken TU_AUTHTOKEN_AQUI
+```
 
-- [ ] **Supabase**: Base de datos creada y schema ejecutado
-- [ ] **PythonAnywhere**: ML API respondiendo en `/health`
-- [ ] **Vercel**: Aplicación web accesible
-- [ ] **Login**: Funciona correctamente
-- [ ] **CRUD**: Crear/editar/eliminar personas funciona
-- [ ] **ML**: Predicciones de riesgo funcionan
+---
 
-### Tests:
+## 📋 Paso 4: Iniciar Docker
+
+```powershell
+# Navegar a tu proyecto
+cd C:\xampp\htdocs\VissApp_v3
+
+# Iniciar Docker Compose
+docker-compose up -d
+
+# Verificar que esté corriendo
+docker-compose ps
+```
+
+Deberías ver:
+- ✅ vissapp_nginx (healthy)
+- ✅ vissapp_php (running)
+- ✅ vissapp_db (healthy)
+- ✅ vissapp_ml (healthy)
+
+---
+
+## 📋 Paso 5: Exponer con Ngrok
+
+### Para la Aplicación Web (Puerto 8000):
+
+```powershell
+ngrok http 8000
+```
+
+Verás algo como:
+
+```
+Session Status                online
+Account                       tu_email@gmail.com
+Version                       3.x.x
+Region                        United States (us)
+Latency                       -
+Web Interface                 http://127.0.0.1:4040
+Forwarding                    https://abc123.ngrok.io -> http://localhost:8000
+
+Connections                   ttl     opn     rt1     rt5     p50     p90
+                              0       0       0.00    0.00    0.00    0.00
+```
+
+**Tu URL pública es:** `https://abc123.ngrok.io` ✅
+
+---
+
+## 📋 Paso 6: Exponer ML API (Opcional)
+
+Si quieres exponer también la ML API por separado:
+
+```powershell
+# En otra terminal
+ngrok http 8001
+```
+
+Obtendrás otra URL para la ML API.
+
+---
+
+## ✅ Verificar que Funciona
+
+### 1. Aplicación Web:
+
+Abre en tu navegador:
+```
+https://abc123.ngrok.io
+```
+
+Deberías ver la página de login de VissApp.
+
+### 2. ML API:
 
 ```bash
-# 1. Test ML API
-curl https://username.pythonanywhere.com/health
-
-# 2. Test Web App
-curl https://vissapp-xxx.vercel.app
-
-# 3. Test ML Prediction
-curl -X POST https://username.pythonanywhere.com/predict \
-  -H "Content-Type: application/json" \
-  -d '{
-    "edad": 28,
-    "pais": "Colombia",
-    "tipo_visa": "Estudiante",
-    "renovaciones_previas": 1,
-    "dias_restantes": 45,
-    "dias_desde_inicio": 320,
-    "porcentaje_transcurrido": 87.67,
-    "en_ultimos_3_meses": 1
-  }'
+curl https://abc123.ngrok.io:8001/health
 ```
 
----
-
-## 💰 Costos y Límites
-
-| Servicio | Plan | Límites | Costo |
-|----------|------|---------|-------|
-| Supabase | Free | 500MB DB, 2GB bandwidth | $0 |
-| PythonAnywhere | Beginner | 512MB storage, 100s CPU/día | $0 |
-| Vercel | Hobby | 100GB bandwidth, ilimitado | $0 |
-| **TOTAL** | | | **$0/mes** 🎉 |
-
----
-
-## ⚠️ Limitaciones Conocidas
-
-### Supabase:
-- Proyectos pausados después de 1 semana de inactividad
-- **Solución**: Hacer login cada semana
-
-### PythonAnywhere:
-- Solo 100 segundos de CPU por día
-- **Solución**: Limitar predicciones ML a ~50/día
-
-### Vercel:
-- Serverless functions (no sesiones persistentes)
-- **Solución**: Ya configurado con cookies
-
----
-
-## 🔄 Actualizaciones
-
-Para actualizar el código:
-
+O si expusiste ML por separado:
 ```bash
-# 1. Hacer cambios localmente
-git add .
-git commit -m "Actualización"
-git push origin main
-
-# 2. Vercel despliega automáticamente
-
-# 3. PythonAnywhere: actualizar manualmente
-# En Bash console:
-cd vissapp-ml
-git pull
-# Reload web app desde dashboard
+curl https://xyz456.ngrok.io/health
 ```
+
+---
+
+## 🔧 Configuración Avanzada (Opcional)
+
+### Usar un Subdominio Personalizado (Plan Gratis)
+
+Crear archivo `ngrok.yml`:
+
+```yaml
+version: "2"
+authtoken: TU_AUTHTOKEN_AQUI
+tunnels:
+  web:
+    proto: http
+    addr: 8000
+  ml:
+    proto: http
+    addr: 8001
+```
+
+Luego ejecutar:
+```powershell
+ngrok start --all
+```
+
+---
+
+## 🌐 URLs Finales
+
+Después de ejecutar Ngrok, tendrás:
+
+- **Aplicación Web**: `https://abc123.ngrok.io`
+- **ML API**: `https://abc123.ngrok.io` (puerto 8001)
+- **ML Docs**: `https://abc123.ngrok.io/docs` (puerto 8001)
+- **Ngrok Dashboard**: `http://localhost:4040` (para ver requests)
+
+---
+
+## 💡 Tips
+
+### Mantener Ngrok Corriendo
+
+Ngrok se cierra si cierras la terminal. Para mantenerlo corriendo:
+
+**Opción 1: Usar `nohup` (Linux/Mac)**
+```bash
+nohup ngrok http 8000 &
+```
+
+**Opción 2: Crear un Servicio de Windows**
+Usar `nssm` (Non-Sucking Service Manager):
+```powershell
+choco install nssm
+nssm install ngrok "C:\Windows\System32\ngrok.exe" "http 8000"
+nssm start ngrok
+```
+
+**Opción 3: Dejar la terminal abierta**
+La más simple: solo deja la terminal abierta.
+
+---
+
+## 🔄 Reiniciar Ngrok
+
+Si reinicias Ngrok, la URL cambiará. Para mantener la misma URL:
+
+**Upgrade a Ngrok Pro** ($8/mes):
+- URL fija personalizada
+- Más conexiones simultáneas
+- Sin limitaciones
+
+O usar el plan gratuito y actualizar la URL cada vez.
+
+---
+
+## 📊 Monitoreo
+
+Ngrok incluye un dashboard web en:
+```
+http://localhost:4040
+```
+
+Ahí puedes ver:
+- Todas las requests HTTP
+- Respuestas
+- Tiempos de respuesta
+- Errores
 
 ---
 
 ## 🐛 Troubleshooting
 
-### Error: "Database connection failed"
+### Error: "command not found: ngrok"
 
-1. Verificar credenciales de Supabase en Vercel
-2. Verificar que proyecto de Supabase no esté pausado
-3. Ir a Supabase → Settings → Database → Verificar host
+Solución:
+```powershell
+# Verificar instalación
+where ngrok
 
-### Error: "ML API not responding"
+# Si no está, reinstalar
+choco install ngrok
+```
 
-1. Verificar que web app esté "Running" en PythonAnywhere
-2. Ver logs en PythonAnywhere → Web → Error log
-3. Verificar que modelo esté en `/home/username/vissapp-ml/models/`
+### Error: "authentication failed"
 
-### Error: "500 Internal Server Error" en Vercel
+Solución:
+```powershell
+# Reconfigurar authtoken
+ngrok config add-authtoken TU_AUTHTOKEN_AQUI
+```
 
-1. Ver logs en Vercel Dashboard → Deployments → Logs
-2. Verificar que todas las variables de entorno estén configuradas
-3. Verificar que `vendor/` esté en el repositorio
+### Docker no está corriendo
 
----
+Solución:
+```powershell
+# Verificar Docker
+docker-compose ps
 
-## 📚 URLs Importantes
-
-- **Supabase Dashboard**: https://app.supabase.com
-- **PythonAnywhere Dashboard**: https://www.pythonanywhere.com/user/username/
-- **Vercel Dashboard**: https://vercel.com/dashboard
-
----
-
-## 🆘 Soporte
-
-Si tienes problemas:
-
-1. **Supabase**: https://supabase.com/docs
-2. **PythonAnywhere**: https://help.pythonanywhere.com
-3. **Vercel**: https://vercel.com/docs
+# Si no está corriendo
+docker-compose up -d
+```
 
 ---
 
-## 🎉 ¡Listo!
+## 💰 Costos
 
-Tu aplicación está desplegada 100% gratis en:
+**Plan Gratuito:**
+- ✅ 1 proceso de Ngrok
+- ✅ 40 conexiones/minuto
+- ✅ HTTPS automático
+- ⚠️ URL cambia al reiniciar
 
-- **Web App**: `https://vissapp-xxx.vercel.app`
-- **ML API**: `https://username.pythonanywhere.com`
-- **Database**: Supabase (PostgreSQL)
+**Costo: $0/mes** 🎉
 
-**Total: $0/mes** 🚀
+**Plan Pro ($8/mes):**
+- ✅ URLs fijas personalizadas
+- ✅ Múltiples túneles simultáneos
+- ✅ Sin límites de conexiones
+
+---
+
+## 🎯 Resumen
+
+1. ✅ Instalar Ngrok: `choco install ngrok`
+2. ✅ Crear cuenta en ngrok.com
+3. ✅ Configurar authtoken
+4. ✅ Iniciar Docker: `docker-compose up -d`
+5. ✅ Exponer con Ngrok: `ngrok http 8000`
+6. ✅ Compartir URL pública: `https://abc123.ngrok.io`
+
+**¡Listo! Tu aplicación está en línea.** 🚀
+
+---
+
+## 📚 Recursos
+
+- [Ngrok Docs](https://ngrok.com/docs)
+- [Ngrok Dashboard](https://dashboard.ngrok.com)
+- [Ngrok Pricing](https://ngrok.com/pricing)
