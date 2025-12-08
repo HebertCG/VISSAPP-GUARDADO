@@ -1,311 +1,326 @@
-# Guía de Despliegue en Render - VissApp v3
+# Guía de Despliegue GRATUITO - VissApp v3
+
+## 🆓 Stack 100% Gratuito
+
+- **Vercel**: Frontend PHP (Gratis)
+- **Supabase**: PostgreSQL (Gratis - 500MB)
+- **PythonAnywhere**: ML API (Gratis - 512MB)
+
+**Costo Total: $0/mes** 🎉
+
+---
 
 ## 📋 Requisitos Previos
 
-- ✅ Cuenta en [Render](https://render.com)
-- ✅ Repositorio en GitHub: https://github.com/HebertCG/VISSAPP-GUARDADO.git
-- ✅ Credenciales de Mailgun y Twilio
+- ✅ Cuenta en GitHub
+- ✅ Repositorio: https://github.com/HebertCG/VISSAPP-GUARDADO.git
+- ⏳ Crear cuentas en:
+  - [Supabase](https://supabase.com)
+  - [PythonAnywhere](https://www.pythonanywhere.com)
+  - [Vercel](https://vercel.com)
 
 ---
 
-## 🚀 Despliegue Automático (Recomendado)
+## 🗄️ PASO 1: Configurar Supabase (Base de Datos)
 
-Render detectará automáticamente el archivo `render.yaml` y creará todos los servicios.
+### 1.1 Crear Proyecto
 
-### Paso 1: Conectar Repositorio
+1. Ir a https://supabase.com
+2. Click en **"New Project"**
+3. Configurar:
+   - **Name**: `vissapp`
+   - **Database Password**: (guardar este password)
+   - **Region**: Closest to you
+   - **Plan**: Free
+4. Click **"Create new project"**
+5. Esperar ~2 minutos
 
-1. Ir a [Render Dashboard](https://dashboard.render.com/)
-2. Click en **"New +"** → **"Blueprint"**
-3. Conectar tu repositorio de GitHub
-4. Seleccionar `VISSAPP-GUARDADO`
-5. Render detectará `render.yaml` automáticamente
+### 1.2 Ejecutar Schema SQL
 
-### Paso 2: Configurar Variables de Entorno
+1. En el dashboard, ir a **"SQL Editor"**
+2. Click **"New query"**
+3. Copiar y pegar el contenido de `database/schema.sql`
+4. Click **"Run"**
+5. Verificar que se crearon las tablas
 
-En el dashboard de Render, configurar las siguientes variables **manualmente**:
+### 1.3 Obtener Credenciales
 
-#### Para `vissapp-web`:
+1. Ir a **"Settings"** → **"Database"**
+2. Copiar:
+   - **Host**: `db.xxx.supabase.co`
+   - **Database name**: `postgres`
+   - **Port**: `5432`
+   - **User**: `postgres`
+   - **Password**: (el que creaste en 1.1)
+
+**Guardar estas credenciales**, las necesitarás después.
+
+---
+
+## 🐍 PASO 2: Configurar PythonAnywhere (ML API)
+
+### 2.1 Crear Cuenta
+
+1. Ir a https://www.pythonanywhere.com
+2. Click **"Pricing & signup"** → **"Create a Beginner account"**
+3. Completar registro (100% gratis)
+
+### 2.2 Subir Código ML
+
+1. En dashboard, ir a **"Files"**
+2. Crear carpeta: `vissapp-ml`
+3. Subir archivos desde `/ml`:
+   - `app.py`
+   - `requirements.txt`
+   - `models/visa_risk_classifier.pkl`
+   - `models/metrics.json`
+
+**Alternativa (más rápido):**
+```bash
+# En PythonAnywhere Bash console
+git clone https://github.com/HebertCG/VISSAPP-GUARDADO.git
+cp -r VISSAPP-GUARDADO/ml/* vissapp-ml/
 ```
-MAILGUN_API_KEY=tu_api_key_aqui
-MAILGUN_DOMAIN=tu_dominio.mailgun.org
+
+### 2.3 Instalar Dependencias
+
+1. Ir a **"Consoles"** → **"Bash"**
+2. Ejecutar:
+```bash
+cd vissapp-ml
+pip3.10 install --user -r requirements.txt
+```
+3. Esperar ~5 minutos
+
+### 2.4 Configurar Web App
+
+1. Ir a **"Web"** → **"Add a new web app"**
+2. Configurar:
+   - **Python version**: 3.10
+   - **Framework**: Manual configuration
+3. En **"Code"**:
+   - **Source code**: `/home/username/vissapp-ml`
+   - **Working directory**: `/home/username/vissapp-ml`
+4. En **"WSGI configuration file"**, editar y reemplazar TODO con:
+
+```python
+import sys
+path = '/home/username/vissapp-ml'  # Cambiar 'username'
+if path not in sys.path:
+    sys.path.append(path)
+
+from app import app as application
+```
+
+5. Click **"Reload"** (botón verde arriba)
+
+### 2.5 Verificar
+
+1. Tu ML API estará en: `https://username.pythonanywhere.com`
+2. Probar: `https://username.pythonanywhere.com/health`
+3. Deberías ver:
+```json
+{
+  "status": "healthy",
+  "modelo_cargado": true,
+  "timestamp": "..."
+}
+```
+
+**Guardar esta URL**, la necesitarás para Vercel.
+
+---
+
+## 🌐 PASO 3: Configurar Vercel (Frontend)
+
+### 3.1 Conectar GitHub
+
+1. Ir a https://vercel.com
+2. Click **"Sign Up"** → **"Continue with GitHub"**
+3. Autorizar Vercel
+
+### 3.2 Importar Proyecto
+
+1. Click **"Add New..."** → **"Project"**
+2. Buscar `VISSAPP-GUARDADO`
+3. Click **"Import"**
+
+### 3.3 Configurar Variables de Entorno
+
+Antes de desplegar, agregar variables de entorno:
+
+1. En la página de configuración, ir a **"Environment Variables"**
+2. Agregar las siguientes:
+
+```
+DB_HOST=db.xxx.supabase.co
+DB_PORT=5432
+DB_DATABASE=postgres
+DB_USERNAME=postgres
+DB_PASSWORD=tu_password_de_supabase
+
+ML_API_URL=https://username.pythonanywhere.com
+
+MAILGUN_API_KEY=tu_mailgun_key
+MAILGUN_DOMAIN=tu_mailgun_domain
+
 TWILIO_SID=tu_twilio_sid
 TWILIO_TOKEN=tu_twilio_token
 TWILIO_FROM=+1234567890
+
+APP_ENV=production
+APP_DEBUG=false
 ```
 
-### Paso 3: Desplegar
+3. Click **"Add"** para cada variable
 
-1. Click en **"Apply"**
-2. Render creará automáticamente:
-   - ✅ `vissapp-web` (PHP + Nginx)
-   - ✅ `vissapp-ml` (FastAPI)
-   - ✅ `vissapp-db` (PostgreSQL)
+### 3.4 Desplegar
 
-3. Esperar ~5-10 minutos para el primer despliegue
+1. Click **"Deploy"**
+2. Esperar ~3-5 minutos
+3. Una vez completado, obtendrás una URL: `https://vissapp-xxx.vercel.app`
 
-### Paso 4: Verificar
+### 3.5 Verificar
 
-Una vez desplegado, tendrás 3 URLs:
-
-- **Web App**: `https://vissapp-web.onrender.com`
-- **ML API**: `https://vissapp-ml.onrender.com`
-- **ML Docs**: `https://vissapp-ml.onrender.com/docs`
-
----
-
-## 🔧 Despliegue Manual (Alternativa)
-
-Si prefieres crear los servicios manualmente:
-
-### 1. Crear Base de Datos
-
-1. Dashboard → **"New +"** → **"PostgreSQL"**
-2. Configurar:
-   - **Name**: `vissapp-db`
-   - **Database**: `vissapp`
-   - **User**: `vissapp_user`
-   - **Plan**: Starter ($7/mes)
-3. Click **"Create Database"**
-4. Guardar las credenciales generadas
-
-### 2. Crear Servicio ML
-
-1. Dashboard → **"New +"** → **"Web Service"**
-2. Conectar repositorio
-3. Configurar:
-   - **Name**: `vissapp-ml`
-   - **Environment**: Docker
-   - **Dockerfile Path**: `./ml/Dockerfile.prod`
-   - **Docker Context**: `./ml`
-   - **Plan**: Starter ($7/mes)
-4. Variables de entorno:
-   ```
-   PYTHONUNBUFFERED=1
-   ```
-5. Click **"Create Web Service"**
-
-### 3. Crear Servicio Web
-
-1. Dashboard → **"New +"** → **"Web Service"**
-2. Conectar repositorio
-3. Configurar:
-   - **Name**: `vissapp-web`
-   - **Environment**: Docker
-   - **Dockerfile Path**: `./docker/php/Dockerfile.prod`
-   - **Docker Context**: `.`
-   - **Plan**: Starter ($7/mes)
-4. Variables de entorno:
-   ```
-   APP_ENV=production
-   APP_DEBUG=false
-   DB_HOST=[copiar desde vissapp-db]
-   DB_PORT=5432
-   DB_DATABASE=vissapp
-   DB_USERNAME=vissapp_user
-   DB_PASSWORD=[copiar desde vissapp-db]
-   ML_API_URL=https://vissapp-ml.onrender.com
-   MAILGUN_API_KEY=tu_api_key
-   MAILGUN_DOMAIN=tu_dominio
-   TWILIO_SID=tu_sid
-   TWILIO_TOKEN=tu_token
-   TWILIO_FROM=+1234567890
-   ```
-5. Click **"Create Web Service"**
-
----
-
-## 📊 Migración de Base de Datos
-
-### Opción 1: Desde MySQL Local
-
-```bash
-# 1. Exportar datos de MySQL
-mysqldump -u root vissappv3 > backup.sql
-
-# 2. Convertir a PostgreSQL (manual)
-# Editar backup.sql:
-# - Cambiar AUTO_INCREMENT por SERIAL
-# - Cambiar backticks ` por comillas dobles "
-# - Cambiar ENGINE=InnoDB por nada
-
-# 3. Conectar a Render PostgreSQL
-psql -h [host_de_render] -U vissapp_user -d vissapp
-
-# 4. Importar schema
-\i database/schema.sql
-
-# 5. Importar datos (si tienes)
-\i backup_convertido.sql
-```
-
-### Opción 2: Usar el Schema Incluido
-
-```bash
-# Conectar a Render PostgreSQL
-psql -h [host_de_render] -U vissapp_user -d vissapp
-
-# Ejecutar schema
-\i database/schema.sql
-```
-
-El schema ya incluye:
-- ✅ Tablas: usuarios, personas, notifications
-- ✅ Índices optimizados
-- ✅ Usuarios de ejemplo (admin, soporte)
-
----
-
-## ✅ Verificación Post-Despliegue
-
-### 1. Health Checks
-
-```bash
-# Web App
-curl https://vissapp-web.onrender.com/
-
-# ML API
-curl https://vissapp-ml.onrender.com/health
-
-# Respuesta esperada:
-# {"status":"healthy","modelo_cargado":true,"timestamp":"..."}
-```
-
-### 2. Test de Funcionalidad
-
-1. **Login**:
+1. Visitar tu URL de Vercel
+2. Deberías ver la página de login
+3. Intentar login con:
    - Usuario: `admin`
    - Password: `admin123`
 
-2. **ML API**:
-   ```bash
-   curl -X POST https://vissapp-ml.onrender.com/predict \
-     -H "Content-Type: application/json" \
-     -d '{
-       "edad": 28,
-       "pais": "Colombia",
-       "tipo_visa": "Estudiante",
-       "renovaciones_previas": 1,
-       "dias_restantes": 45,
-       "dias_desde_inicio": 320,
-       "porcentaje_transcurrido": 87.67,
-       "en_ultimos_3_meses": 1
-     }'
-   ```
-
-3. **CRUD de Personas**:
-   - Crear nueva persona
-   - Editar persona
-   - Eliminar persona
-
 ---
 
-## 💰 Costos Mensuales
+## ✅ Verificación Completa
 
-| Servicio | Plan | Costo |
-|----------|------|-------|
-| vissapp-web | Starter | $7/mes |
-| vissapp-ml | Starter | $7/mes |
-| vissapp-db | Starter | $7/mes |
-| **Total** | | **$21/mes** |
+### Checklist:
 
-**Nota**: Render ofrece $5 de crédito gratis al registrarte.
+- [ ] **Supabase**: Base de datos creada y schema ejecutado
+- [ ] **PythonAnywhere**: ML API respondiendo en `/health`
+- [ ] **Vercel**: Aplicación web accesible
+- [ ] **Login**: Funciona correctamente
+- [ ] **CRUD**: Crear/editar/eliminar personas funciona
+- [ ] **ML**: Predicciones de riesgo funcionan
 
----
-
-## 🔄 Actualizaciones Automáticas
-
-Render despliega automáticamente cuando haces push a `main`:
+### Tests:
 
 ```bash
-# Hacer cambios en el código
+# 1. Test ML API
+curl https://username.pythonanywhere.com/health
+
+# 2. Test Web App
+curl https://vissapp-xxx.vercel.app
+
+# 3. Test ML Prediction
+curl -X POST https://username.pythonanywhere.com/predict \
+  -H "Content-Type: application/json" \
+  -d '{
+    "edad": 28,
+    "pais": "Colombia",
+    "tipo_visa": "Estudiante",
+    "renovaciones_previas": 1,
+    "dias_restantes": 45,
+    "dias_desde_inicio": 320,
+    "porcentaje_transcurrido": 87.67,
+    "en_ultimos_3_meses": 1
+  }'
+```
+
+---
+
+## 💰 Costos y Límites
+
+| Servicio | Plan | Límites | Costo |
+|----------|------|---------|-------|
+| Supabase | Free | 500MB DB, 2GB bandwidth | $0 |
+| PythonAnywhere | Beginner | 512MB storage, 100s CPU/día | $0 |
+| Vercel | Hobby | 100GB bandwidth, ilimitado | $0 |
+| **TOTAL** | | | **$0/mes** 🎉 |
+
+---
+
+## ⚠️ Limitaciones Conocidas
+
+### Supabase:
+- Proyectos pausados después de 1 semana de inactividad
+- **Solución**: Hacer login cada semana
+
+### PythonAnywhere:
+- Solo 100 segundos de CPU por día
+- **Solución**: Limitar predicciones ML a ~50/día
+
+### Vercel:
+- Serverless functions (no sesiones persistentes)
+- **Solución**: Ya configurado con cookies
+
+---
+
+## 🔄 Actualizaciones
+
+Para actualizar el código:
+
+```bash
+# 1. Hacer cambios localmente
 git add .
-git commit -m "Actualización de funcionalidad"
+git commit -m "Actualización"
 git push origin main
 
-# Render detecta el push y despliega automáticamente
+# 2. Vercel despliega automáticamente
+
+# 3. PythonAnywhere: actualizar manualmente
+# En Bash console:
+cd vissapp-ml
+git pull
+# Reload web app desde dashboard
 ```
 
 ---
 
 ## 🐛 Troubleshooting
 
-### Error: "Build Failed"
+### Error: "Database connection failed"
 
-1. Ver logs en Render Dashboard
-2. Verificar que Dockerfiles existan
-3. Verificar rutas en `render.yaml`
+1. Verificar credenciales de Supabase en Vercel
+2. Verificar que proyecto de Supabase no esté pausado
+3. Ir a Supabase → Settings → Database → Verificar host
 
-### Error: "Database Connection Failed"
+### Error: "ML API not responding"
 
-1. Verificar variables de entorno en `vissapp-web`
-2. Verificar que `vissapp-db` esté "Available"
-3. Verificar credenciales de DB
+1. Verificar que web app esté "Running" en PythonAnywhere
+2. Ver logs en PythonAnywhere → Web → Error log
+3. Verificar que modelo esté en `/home/username/vissapp-ml/models/`
 
-### Error: "ML API Not Responding"
+### Error: "500 Internal Server Error" en Vercel
 
-1. Ver logs de `vissapp-ml`
-2. Verificar que modelo esté en `/ml/models/`
-3. Verificar health check: `/health`
-
-### Servicio en "Suspended"
-
-Render suspende servicios inactivos en free tier. Solución:
-- Upgrade a plan Starter
-- O hacer request cada 15 minutos
+1. Ver logs en Vercel Dashboard → Deployments → Logs
+2. Verificar que todas las variables de entorno estén configuradas
+3. Verificar que `vendor/` esté en el repositorio
 
 ---
 
-## 📝 Logs
+## 📚 URLs Importantes
 
-Ver logs en tiempo real:
-
-1. Dashboard → Seleccionar servicio
-2. Click en **"Logs"**
-3. O usar Render CLI:
-   ```bash
-   render logs vissapp-web
-   ```
-
----
-
-## 🔒 Seguridad
-
-### Variables de Entorno
-
-- ✅ Nunca commitear `.env` con credenciales reales
-- ✅ Usar "Environment Variables" en Render Dashboard
-- ✅ Rotar credenciales periódicamente
-
-### HTTPS
-
-- ✅ Render proporciona HTTPS automático
-- ✅ Certificados SSL gratuitos
-- ✅ Renovación automática
-
----
-
-## 🌐 Dominio Personalizado (Opcional)
-
-1. Dashboard → `vissapp-web` → **"Settings"**
-2. Scroll a **"Custom Domain"**
-3. Agregar tu dominio (ej: `vissapp.com`)
-4. Configurar DNS según instrucciones de Render
-5. Esperar propagación DNS (~24h)
-
----
-
-## 📚 Recursos
-
-- [Render Docs](https://render.com/docs)
-- [Render YAML Spec](https://render.com/docs/yaml-spec)
-- [PostgreSQL en Render](https://render.com/docs/databases)
-- [Docker en Render](https://render.com/docs/docker)
+- **Supabase Dashboard**: https://app.supabase.com
+- **PythonAnywhere Dashboard**: https://www.pythonanywhere.com/user/username/
+- **Vercel Dashboard**: https://vercel.com/dashboard
 
 ---
 
 ## 🆘 Soporte
 
 Si tienes problemas:
-1. Ver logs en Dashboard
-2. Consultar [Render Community](https://community.render.com/)
-3. Contactar soporte de Render
+
+1. **Supabase**: https://supabase.com/docs
+2. **PythonAnywhere**: https://help.pythonanywhere.com
+3. **Vercel**: https://vercel.com/docs
+
+---
+
+## 🎉 ¡Listo!
+
+Tu aplicación está desplegada 100% gratis en:
+
+- **Web App**: `https://vissapp-xxx.vercel.app`
+- **ML API**: `https://username.pythonanywhere.com`
+- **Database**: Supabase (PostgreSQL)
+
+**Total: $0/mes** 🚀
