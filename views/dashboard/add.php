@@ -24,8 +24,8 @@ $user = $_SESSION['user'] ?? '';   // por si la vista quiere mostrarlo
   <title><?= $data['id'] ? 'Editar' : 'Nueva' ?> Persona</title>
 
   <!-- HOJAS DE ESTILO (Bootstrap + SweetAlert2 + Animaciones) -------- -->
-  <link rel="stylesheet" href="/VissApp_v3/public/vendor/bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/VissApp_v3/public/vendor/sweetalert2/sweetalert2.min.css">
+  <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="vendor/sweetalert2/sweetalert2.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
   <!-- Estilos puntuales de la vista --------------------------------- -->
@@ -193,8 +193,8 @@ $user = $_SESSION['user'] ?? '';   // por si la vista quiere mostrarlo
 <!-- ===============================================================
      3.  SCRIPTS (jQuery + SweetAlert2 + lógica OCR/AJAX)
 ================================================================ -->
-<script src="/VissApp_v3/public/vendor/jquery/jquery-3.7.1.min.js"></script>
-<script src="/VissApp_v3/public/vendor/sweetalert2/sweetalert2.all.min.js"></script>
+<script src="vendor/jquery/jquery-3.7.1.min.js"></script>
+<script src="vendor/sweetalert2/sweetalert2.all.min.js"></script>
 <script>
 /* ---------------------------------------------------------------
    FLAGS Y UTILIDADES 

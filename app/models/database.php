@@ -23,10 +23,10 @@ class Database
             $cfg = require __DIR__ . '/../../config/database.php';
 
             $dsn = sprintf(
-                'mysql:host=%s;dbname=%s;charset=%s',
+                'pgsql:host=%s;port=%s;dbname=%s',
                 $cfg['host'],
-                $cfg['dbname'],
-                $cfg['charset']
+                $cfg['port'] ?? '5432',
+                $cfg['dbname']
             );
 
             try {

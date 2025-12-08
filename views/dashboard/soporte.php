@@ -180,7 +180,7 @@ $introduccion = $contenido['introduccion'] ?? 'Bienvenido al Centro de Soporte d
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userMenu" data-toggle="dropdown">
                         <span class="mr-2 text-gray-600"><?= htmlspecialchars($user) ?></span>
-                        <img src="/VissApp_v3/public/img/user.png" class="rounded-circle" width="32">
+                        <img src="img/user.png" class="rounded-circle" width="32">
                     </a>
                     <div class="dropdown-menu dropdown-menu-right">
                         <a class="dropdown-item" href="index.php?route=logout">

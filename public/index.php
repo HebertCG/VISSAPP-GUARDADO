@@ -14,7 +14,9 @@ $dotenv = Dotenv\Dotenv::createMutable($root);
 $dotenv->load();
 
 foreach ($_ENV as $name => $value) {
-    putenv("$name=$value");
+    if (is_string($value)) {
+        putenv("$name=$value");
+    }
 }
 
 if (isset($_GET['env_test'])) {

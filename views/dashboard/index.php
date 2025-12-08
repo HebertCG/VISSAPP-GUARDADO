@@ -80,7 +80,7 @@ $user = $_SESSION['user'] ?? 'Invitado';
         <li class="nav-item dropdown">
           <a id="userMenu" class="nav-link d-flex align-items-center" data-toggle="dropdown" href="#">
             <span class="d-none d-lg-inline mr-2"><?= htmlspecialchars($user) ?></span>
-            <img class="avatar-sm" src="/VissApp_v3/public/img/user.png" alt="avatar">
+            <img class="avatar-sm" src="img/user.png" alt="avatar">
           </a>
           <div class="dropdown-menu dropdown-menu-right user-dropdown">
             <h6 class="dropdown-header">

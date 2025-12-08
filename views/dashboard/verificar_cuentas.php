@@ -12,10 +12,10 @@ $user = $_SESSION['user'] ?? 'Invitado';
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>VisApp · Verificar Cuentas</title>
-  <link rel="stylesheet" href="/VissApp_v3/public/vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-  <link rel="stylesheet" href="/VissApp_v3/public/css/styleverify.css">
-  <link rel="stylesheet" href="/VissApp_v3/public/css/styletopbar.css">
+  <link rel="stylesheet" href="css/styleverify.css">
+  <link rel="stylesheet" href="css/styletopbar.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     .main-content { margin-left: 220px; padding: 1rem; }
@@ -60,7 +60,7 @@ $user = $_SESSION['user'] ?? 'Invitado';
       <li class="nav-item dropdown">
         <a id="userMenu" class="nav-link d-flex align-items-center" data-toggle="dropdown" href="#">
           <span class="d-none d-lg-inline mr-2"><?= htmlspecialchars($user) ?></span>
-          <img class="avatar-sm" src="/VissApp_v3/public/img/user.png" alt="avatar">
+          <img class="avatar-sm" src="img/user.png" alt="avatar">
         </a>
         <div class="dropdown-menu dropdown-menu-right user-dropdown">
           <h6 class="dropdown-header">
@@ -109,7 +109,7 @@ $user = $_SESSION['user'] ?? 'Invitado';
               <tr>
                 <td><?= (int)$cuenta['id'] ?></td>
                 <td class="author-cell" data-id="<?= $cuenta['id'] ?>">
-                  <img class="avatar" src="https://ui-avatars.com/api/?name=<?= urlencode($nombreCuenta) ?>&background=random&size=64" alt="avatar" onerror="this.src='/VissApp_v3/public/img/default.png'">
+                  <img class="avatar" src="https://ui-avatars.com/api/?name=<?= urlencode($nombreCuenta) ?>&background=random&size=64" alt="avatar" onerror="this.src='img/default.png'">
                   <div>
                     <p class="name mb-0"><?= htmlspecialchars($nombreCuenta) ?></p>
                     <p class="sub mb-0 text-capitalize"><?= htmlspecialchars($rolCuenta) ?></p>
@@ -151,8 +151,8 @@ $user = $_SESSION['user'] ?? 'Invitado';
     </footer>
   </div>
 
-  <script src="/VissApp_v3/public/vendor/jquery/jquery-3.7.1.min.js"></script>
-  <script src="/VissApp_v3/public/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="vendor/jquery/jquery-3.7.1.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script>
     $(function() {
       $('#searchInput').on('keyup', function() {

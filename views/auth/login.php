@@ -5,9 +5,9 @@
   <meta charset="UTF-8">
   <title>VisApp · Iniciar Sesión</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/VissApp_v3/public/vendor/sweetalert2/sweetalert2.min.css">
+  <link rel="stylesheet" href="vendor/sweetalert2/sweetalert2.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <link rel="stylesheet" href="/VissApp_v3/public/css/stylelogin.css">
+  <link rel="stylesheet" href="css/stylelogin.css">
 </head>
 
 <body>
@@ -18,7 +18,7 @@
           <div class="card1">
             <div class="row justify-content-center">
               <!-- La ilustración está muy cerca del cuadro, sin scroll vertical -->
-              <img src="/VissApp_v3/public/img/login.png" class="image" alt="Ilustración">
+              <img src="img/login.png" class="image" alt="Ilustración">
             </div>
           </div>
         </div>
@@ -27,7 +27,7 @@
           <div class="card2 card border-0">
             <!-- Logo centrado -->
             <div class="row justify-content-center">
-              <img src="/VissApp_v3/public/img/letras.png" class="letras" alt="Logo">
+              <img src="img/letras.png" class="letras" alt="Logo">
             </div>
 
             <!-- “Sign in with” y botones -->
@@ -90,7 +90,7 @@
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-  <script src="/VissApp_v3/public/vendor/sweetalert2/sweetalert2.all.min.js"></script>
+  <script src="vendor/sweetalert2/sweetalert2.all.min.js"></script>
   <script>
     $(function() {
       $('#formLogin').on('submit', function(e) {

@@ -14,10 +14,10 @@ $data = $data ?? [];
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>VisApp · Lista Usuarios</title>
-  <link rel="stylesheet" href="/VissApp_v3/public/vendor/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-  <link rel="stylesheet" href="/VissApp_v3/public/vendor/datatables/dataTables.bootstrap4.min.css">
-  <link rel="stylesheet" href="/VissApp_v3/public/css/stylelista.css"> <link rel="stylesheet" href="/VissApp_v3/public/css/styletopbar.css"> <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="vendor/datatables/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="css/stylelista.css"> <link rel="stylesheet" href="css/styletopbar.css"> <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     
     .sidebar {
@@ -92,7 +92,7 @@ $data = $data ?? [];
         <li class="nav-item dropdown">
           <a id="userMenu" class="nav-link d-flex align-items-center" data-toggle="dropdown" href="#">
             <span class="d-none d-lg-inline mr-2"><?= htmlspecialchars($user) ?></span>
-            <img class="avatar-sm" src="/VissApp_v3/public/img/user.png" alt="avatar">
+            <img class="avatar-sm" src="img/user.png" alt="avatar">
           </a>
           <div class="dropdown-menu dropdown-menu-right user-dropdown">
             <h6 class="dropdown-header">
@@ -191,8 +191,8 @@ $data = $data ?? [];
     </footer>
   </div>
 
-  <script src="/VissApp_v3/public/vendor/jquery/jquery-3.7.1.min.js"></script>
-  <script src="/VissApp_v3/public/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="vendor/jquery/jquery-3.7.1.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script>
   $(function(){
     const $tbody = $('#tablaLista tbody');
