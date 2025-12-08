@@ -181,10 +181,10 @@ $user = $_SESSION['user'] ?? 'Invitado';
                     <td><?= htmlspecialchars($dat['correo']) ?></td>
                     <td><?= htmlspecialchars($dat['telefono']) ?></td>
                     <td><?= (int)$dat['edad'] ?></td>
-                    <td><?= htmlspecialchars($dat['numeroVisa']) ?></td>
+                    <td><?= htmlspecialchars($dat['numeroVisa'] ?? '') ?></td>
                     <td><?= htmlspecialchars($dat['referenciaTransaccion'] ?? '') ?></td>
-                    <td><?= htmlspecialchars($dat['fechaInicio']) ?></td>
-                    <td><?= htmlspecialchars($dat['fechaFinal']) ?></td>
+                    <td><?= htmlspecialchars($dat['fechaInicio'] ?? '') ?></td>
+                    <td><?= htmlspecialchars($dat['fechaFinal'] ?? '') ?></td>
                     <td>
                       <?php
                       $d = (int)$dat['daysRemaining'];
