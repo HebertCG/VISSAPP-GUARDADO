@@ -311,16 +311,18 @@ class PersonaController
         $red = $yellow = $green = 0;
 
         foreach ($data as &$p) {
-            // Verificar que fechaFinal no sea NULL
-            if ($p['fechaFinal'] === null) {
+            // Verificar que fechaFinal exista y no sea NULL
+            if (!isset($p['fechaFinal']) || $p['fechaFinal'] === null) {
                 $p['daysRemaining'] = 0;
                 $red++;
                 continue;
             }
             
             // Días hasta que expire
-            $dias = max(0, (new \DateTimeImmutable($p['fechaFinal']))
-                               ->diff($hoy)->days);
+            $fin  = new \DateTimeImmutable($p['fechaFinal']);
+            $diff = $hoy->diff($fin);
+
+            $dias = ($diff->invert === 1) ? 0 : $diff->days;
             $p['daysRemaining'] = $dias;
 
             // Clasificación por color

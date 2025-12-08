@@ -21,15 +21,15 @@ class PersonaService
                 id,
                 nombre,
                 apellido,
-                tipoVisa,
+                tipoVisa as \"tipoVisa\",
                 pais,
                 correo,
                 telefono,
                 edad,
-                numeroVisa,
-                referenciaTransaccion,
-                fechaInicio,
-                fechaFinal
+                numeroVisa as \"numeroVisa\",
+                referenciaTransaccion as \"referenciaTransaccion\",
+                fechaInicio as \"fechaInicio\",
+                fechaFinal as \"fechaFinal\"
             FROM personas
             ORDER BY id
         ";

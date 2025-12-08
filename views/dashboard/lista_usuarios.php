@@ -157,20 +157,20 @@ $data = $data ?? [];
           <tbody>
             <?php foreach($data as $u): ?>
             <tr data-id="<?= (int)$u['id'] ?>"
-                data-email="<?= htmlspecialchars($u['correo'], ENT_QUOTES) ?>"
-                data-tel="<?= htmlspecialchars($u['telefono'], ENT_QUOTES) ?>"
-                data-dias="<?= (int)$u['daysRemaining'] ?>">
-              <td><?= (int)$u['id'] ?></td>
-              <td><?= htmlspecialchars($u['nombre'], ENT_QUOTES) ?></td>
-              <td><?= htmlspecialchars($u['apellido'], ENT_QUOTES) ?></td>
-              <td><?= htmlspecialchars($u['tipoVisa'], ENT_QUOTES) ?></td>
-              <td><?= htmlspecialchars($u['pais'], ENT_QUOTES) ?></td>
-              <td><?= htmlspecialchars($u['correo'], ENT_QUOTES) ?></td>
-              <td><?= htmlspecialchars($u['telefono'], ENT_QUOTES) ?></td>
-              <td><?= htmlspecialchars($u['referenciaTransaccion'] ?? '—') ?></td>
-              <td><?= htmlspecialchars($u['fechaInicio'], ENT_QUOTES) ?></td>
-              <td><?= htmlspecialchars($u['fechaFinal'], ENT_QUOTES) ?></td>
-              <td><?= (int)$u['daysRemaining'] ?> días</td>
+                data-email="<?= htmlspecialchars((string)($u['correo'] ?? ''), ENT_QUOTES) ?>"
+                data-tel="<?= htmlspecialchars((string)($u['telefono'] ?? ''), ENT_QUOTES) ?>"
+                data-dias="<?= (int)($u['daysRemaining'] ?? 0) ?>">
+              <td><?= htmlspecialchars((string)($u['id'] ?? ''), ENT_QUOTES) ?></td>
+              <td><?= htmlspecialchars((string)($u['nombre'] ?? ''), ENT_QUOTES) ?></td>
+              <td><?= htmlspecialchars((string)($u['apellido'] ?? ''), ENT_QUOTES) ?></td>
+              <td><?= htmlspecialchars((string)($u['tipoVisa'] ?? ''), ENT_QUOTES) ?></td>
+              <td><?= htmlspecialchars((string)($u['pais'] ?? ''), ENT_QUOTES) ?></td>
+              <td><?= htmlspecialchars((string)($u['correo'] ?? ''), ENT_QUOTES) ?></td>
+              <td><?= htmlspecialchars((string)($u['telefono'] ?? ''), ENT_QUOTES) ?></td>
+              <td><?= htmlspecialchars((string)($u['referenciaTransaccion'] ?? '—'), ENT_QUOTES) ?></td>
+              <td><?= htmlspecialchars((string)($u['fechaInicio'] ?? ''), ENT_QUOTES) ?></td>
+              <td><?= htmlspecialchars((string)($u['fechaFinal'] ?? ''), ENT_QUOTES) ?></td>
+              <td><?= (int)($u['daysRemaining'] ?? 0) ?> días</td>
               <td class="text-center">
                 <button class="btn btn-sm btn-primary btn-send-email">
                   <i class="fas fa-envelope"></i>

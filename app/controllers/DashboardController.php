@@ -37,8 +37,8 @@ class DashboardController
 
         // Recorremos cada persona por referencia (&$persona) 
         foreach ($data as &$persona) {
-            // Verificar que fechaFinal no sea NULL
-            if ($persona['fechaFinal'] === null) {
+            // Verificar que fechaFinal exista y no sea NULL
+            if (!isset($persona['fechaFinal']) || $persona['fechaFinal'] === null) {
                 $persona['daysRemaining'] = 0;
                 $red++;
                 continue;
@@ -46,10 +46,12 @@ class DashboardController
             
             // creamos un DateTimeImmutable con la fecha final de la visa
             $fin = new \DateTimeImmutable($persona['fechaFinal']);
-            // Calculamos la diferencia absoluta en días
-            $diffDays = $fin->diff($hoy)->days;
-            // Evitamos valores negativos
-            $diasRestantes = max(0, $diffDays);
+            // Calculamos la diferencia con hoy
+            $diff = $hoy->diff($fin);
+            
+            // Si la fecha ya pasó (invert=1), quedan 0 días. Si no, tomamos los días.
+            $diasRestantes = ($diff->invert === 1) ? 0 : $diff->days;
+            
             // Añadimos al array el nuevo campo para usarlo en la vista:
             $persona['daysRemaining'] = $diasRestantes;
 
