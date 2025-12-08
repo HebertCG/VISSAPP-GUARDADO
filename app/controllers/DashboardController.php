@@ -37,8 +37,8 @@ class DashboardController
 
         // Recorremos cada persona por referencia (&$persona) 
         foreach ($data as &$persona) {
-            // Verificar que fechaFinal existe y no está vacío
-            if (empty($persona['fechaFinal'])) {
+            // Verificar que fechaFinal existe y tiene un valor válido
+            if (!isset($persona['fechaFinal']) || $persona['fechaFinal'] === '' || $persona['fechaFinal'] === null) {
                 $persona['daysRemaining'] = 0;
                 $red++;
                 continue;

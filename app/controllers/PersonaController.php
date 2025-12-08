@@ -311,6 +311,13 @@ class PersonaController
         $red = $yellow = $green = 0;
 
         foreach ($data as &$p) {
+            // Verificar que fechaFinal existe y tiene un valor válido
+            if (!isset($p['fechaFinal']) || $p['fechaFinal'] === '' || $p['fechaFinal'] === null) {
+                $p['daysRemaining'] = 0;
+                $red++;
+                continue;
+            }
+            
             // Días hasta que expire
             $dias = max(0, (new \DateTimeImmutable($p['fechaFinal']))
                                ->diff($hoy)->days);
