@@ -200,9 +200,10 @@ $data = $data ?? [];
     // Manejador de clic del boton de enviar
     $tbody.on('click','.btn-send-email',function(){
       const $tr = $(this).closest('tr'),
+            id   = $tr.data('id'),           // AGREGADO: obtener el ID
             mail = $tr.data('email'),
             dias = $tr.data('dias'),
-            name = $tr.find('td').eq(1).text();
+            name = $tr.find('td').eq(1).text() + ' ' + $tr.find('td').eq(2).text();
 
       //Mostrar el modal de carga
       Swal.fire({
@@ -212,7 +213,7 @@ $data = $data ?? [];
           Swal.showLoading();
 
           //peticion ajax para enviar email
-          $.post('index.php?route=send_email',{ mail,dias,name },res=>{
+          $.post('index.php?route=send_email',{ id, mail, dias, name },res=>{
             Swal.close();
             if(res.success){
               //exito 

@@ -228,7 +228,25 @@ $('#visaPdf').on('change', function () {
     contentType: false,
     dataType: 'json'
   }).done(res => {
-    // 3) Rellena campos si los obtuvo
+    console.log("Respuesta del servidor OCR:", res); // DEBUG VISIBLE EN CONSOLA
+
+    // Debug con alerta para el usuario si no hay datos
+    if (!res || Object.values(res).every(x => !x)) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Sin datos detectados',
+            text: 'El servicio de IA no devolvió ningún campo válido. Revisa los logs de consola (F12).'
+        });
+        return;
+    }
+    
+    // 3) Rellena campos personales
+    if (res.nombre) $('[name="nombre"]').val(res.nombre);
+    if (res.apellido) $('[name="apellido"]').val(res.apellido);
+    if (res.edad) $('[name="edad"]').val(res.edad);
+    if (res.pais) $('#pais').val(res.pais);
+    
+    // 4) Rellena campos de visa
     if (res.numeroVisa)  $('#numeroVisa').val(res.numeroVisa);
     if (res.fechaInicio) $('#fechaInicio').val(res.fechaInicio);
     if (res.fechaFinal)  $('#fechaFinal').val(res.fechaFinal);
@@ -267,12 +285,15 @@ $('#visaPdf').on('change', function () {
 
     // 5) Feedback visual ✔️
     const msg=[];
+    if(res.nombre)       msg.push('Nombre');
+    if(res.apellido)     msg.push('Apellido');
+    if(res.edad)         msg.push('Edad');
+    if(res.pais)         msg.push('País');
     if(res.numeroVisa)   msg.push('Número de visa');
     if(res.fechaInicio)  msg.push('Fecha de concesión');
     if(res.fechaFinal)   msg.push('Duración de estadía');
     if(res.visa)         msg.push('Tipo de visa');
-    if(res.referenciaTransaccion) msg.push('Transaccion  de pago')
-    if(res.passportCountry) msg.push('País');
+    if(res.referenciaTransaccion) msg.push('Transacción de pago');
     if(msg.length){
       Swal.fire({
         html : `<i class="fas fa-check-circle fa-4x animate__animated animate__bounceIn"></i>
@@ -286,6 +307,169 @@ $('#visaPdf').on('change', function () {
     Swal.fire({icon:'error', title:'Error', text:'No se pudo analizar el PDF.'});
   });
 });
+
+/* ---------------------------------------------------------------
+   OCR CAMARA (SCAN) - MODAL MANUAL (V3 INFALIBLE)
+---------------------------------------------------------------- */
+let globalStream = null;
+
+$('#btnScan').off('click').on('click', async function() {
+  
+  // Limpiar anterior
+  if(globalStream) {
+      globalStream.getTracks().forEach(track => track.stop());
+      globalStream = null;
+  }
+
+  // HTML: Botón explícito de iniciar
+  const videoHtml = `
+    <div style="background: #000; min-height: 320px; position: relative; border-radius: 8px; overflow: hidden;">
+      <video id="ocrVideo" style="width: 100%; height: 320px; object-fit: cover; display: none;" autoplay playsinline muted></video>
+      
+      <!-- Capa de Inicio -->
+      <div id="startOverlay" style="position: absolute; top:0; left:0; width:100%; height:100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #222; z-index: 10;">
+        <i class="fas fa-camera fa-3x text-white mb-3"></i>
+        <button type="button" class="btn btn-primary px-4" id="btnStartCamera">
+          <i class="fas fa-power-off"></i> INICIAR CÁMARA
+        </button>
+        <div id="ocrStatus" class="text-white mt-3 small">Esperando acción...</div>
+      </div>
+
+      <!-- Guía (oculta al inicio) -->
+      <div id="guideOverlay" style="display:none; position: absolute; top: 10%; left: 10%; right: 10%; bottom: 10%; border: 2px dashed rgba(255,255,255,0.7); pointer-events: none; z-index: 5;"></div>
+    </div>
+    
+    <div class="mt-3 text-center">
+        <button type="button" class="btn btn-sm btn-link text-muted" onclick="document.getElementById('cameraInput').click(); Swal.close();">
+            ¿Problemas? Subir archivo en su lugar
+        </button>
+    </div>
+    <canvas id="ocrCanvas" style="display:none;"></canvas>
+  `;
+
+  await Swal.fire({
+      title: 'Escanear Documento',
+      html: videoHtml,
+      showCancelButton: true,
+      showConfirmButton: false, // Se activa solo cuando hay video
+      cancelButtonText: 'Cerrar',
+      didOpen: () => {
+          // Bindear clic al botón de iniciar
+          document.getElementById('btnStartCamera').addEventListener('click', async () => {
+              const status = document.getElementById('ocrStatus');
+              const video = document.getElementById('ocrVideo');
+              const overlay = document.getElementById('startOverlay');
+              const guide = document.getElementById('guideOverlay');
+              const btnStart = document.getElementById('btnStartCamera');
+              
+              const log = (m) => status.innerText = m;
+              
+              try {
+                  btnStart.disabled = true;
+                  log('Solicitando permisos...');
+                  
+                  // Pedir stream
+                  globalStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                  
+                  log('Cámara activa. Iniciando video...');
+                  video.srcObject = globalStream;
+                  video.muted = true;
+                  video.setAttribute('playsinline', '');
+                  
+                  // Esperar a que el video esté listo para mostrar
+                  video.onplaying = () => {
+                      overlay.style.display = 'none'; // Ocultar overlay
+                      video.style.display = 'block';  // Mostrar video
+                      guide.style.display = 'block';  // Mostrar guía
+                      
+                      // Habilitar botón de Capturar (inyectándolo en la alerta)
+                      Swal.update({
+                          showConfirmButton: true,
+                          confirmButtonText: '📸 CAPTURAR AHORA'
+                      });
+                  };
+                  
+                  await video.play();
+                  
+              } catch (err) {
+                  console.error(err);
+                  btnStart.disabled = false;
+                  log('❌ Error: ' + err.message);
+                  Swal.showValidationMessage('Error: ' + err.message);
+              }
+          });
+      },
+      willClose: () => {
+          if (globalStream) {
+             globalStream.getTracks().forEach(track => track.stop());
+             globalStream = null;
+          }
+      },
+      preConfirm: () => {
+        const video = document.getElementById('ocrVideo');
+        if (!video || !video.videoWidth) return null;
+        const canvas = document.getElementById('ocrCanvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+      }
+  }).then((result) => {
+      if (result.isConfirmed && result.value) {
+          procesarImagenOCR(result.value);
+      }
+  });
+});
+
+function procesarImagenOCR(blob) {
+  Swal.fire({
+    title: 'Analizando imagen...',
+    text: 'Extrayendo datos con IA',
+    allowOutsideClick: false,
+    didOpen: () => { Swal.showLoading(); }
+  });
+
+  const fd = new FormData();
+  fd.append('file', blob, 'capture.jpg');
+
+  $.ajax({
+    url: 'http://localhost:8001/extract-data',
+    type: 'POST',
+    data: fd,
+    processData: false,
+    contentType: false,
+    success: function(res) {
+      Swal.close();
+      
+      let msg = [];
+      // Mapeo inteligente de campos
+      if(res.nombre) { $('[name="nombre"]').val(res.nombre); msg.push('Nombre'); }
+      if(res.apellido) { $('[name="apellido"]').val(res.apellido); msg.push('Apellido'); }
+      if(res.numeroVisa) { $('#numeroVisa').val(res.numeroVisa); msg.push('Nº Visa'); }
+      if(res.pais) { $('#pais').val(res.pais); msg.push('País'); }
+
+      if(msg.length > 0) {
+        Swal.fire({
+          icon: 'success',
+          title: '¡Datos encontrados!',
+          html: `<p>Se extrajo: <b>${msg.join(', ')}</b></p>
+                 <small>Verifica que sean correctos antes de guardar.</small>`,
+          timer: 3000
+        });
+      } else {
+        Swal.fire({
+          icon: 'warning',
+          title: 'No se detectaron datos',
+          text: 'Intenta mejorar la iluminación o acercar más el documento.'
+        });
+      }
+    },
+    error: function(err) {
+      console.error(err);
+      Swal.fire('Error', 'Fallo conexión con IA (asegúrate que el servicio ML esté corriendo)', 'error');
+    }
+  });
+}
 
 /* ---------------------------------------------------------------
    ENVÍO DEL FORMULARIO  (AJAX → persona_save)

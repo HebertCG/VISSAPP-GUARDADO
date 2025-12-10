@@ -46,9 +46,9 @@ class EmailService
             ->send(                    // Método para enviar
                 $this->domain,         // Dominio desde el que enviamos
                 [
-                    // Remitente. En sandbox suele ser postmaster@dominio
+                    // Remitente mejorado para evitar SPAM
                     'from'    => sprintf(
-                                    'VissApp Sandbox <postmaster@%s>',
+                                    'VissApp Notificaciones <no-reply@%s>',
                                     $this->domain
                                 ),
 
@@ -60,6 +60,15 @@ class EmailService
 
                     // Cuerpo del mensaje en HTML
                     'html'    => $body,
+                    
+                    // Headers adicionales para evitar SPAM
+                    'h:X-Mailgun-Tag' => 'visa-notification',
+                    'h:Reply-To' => 'soporte@vissapp.com',
+                    'h:X-Priority' => '1',
+                    'h:Importance' => 'high',
+                    
+                    // Texto plano alternativo (mejora deliverability)
+                    'text'    => strip_tags($body)
                 ]
             );
     }

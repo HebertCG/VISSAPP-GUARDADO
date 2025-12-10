@@ -77,60 +77,86 @@ class PersonaController
      * Responde JSON para que el front rellene los campos.
      */
    public function previewVisaPdf(): void
-{
-    header('Content-Type: application/json');
+    {
+        header('Content-Type: application/json');
 
-    // Estructura de salida por defecto
-    $out = [
-        'numeroVisa'             => '',
-        'fechaInicio'            => '',
-        'fechaFinal'             => '',
-        'visa'                   => '',
-        'passportCountry'        => '',
-        'referenciaTransaccion'  => ''  // ✅ nuevo campo
-    ];
+        // Estructura de salida por defecto
+        $out = [
+            'nombre'                 => '',
+            'apellido'               => '',
+            'numeroVisa'             => '',
+            'fechaInicio'            => '',
+            'fechaFinal'             => '',
+            'visa'                   => '',
+            'pais'                   => '',
+            'edad'                   => 0,
+            'referenciaTransaccion'  => ''
+        ];
 
-    if (empty($_FILES['visaPdf']['tmp_name'])) {
+        if (empty($_FILES['visaPdf']['tmp_name'])) {
+            echo json_encode($out);
+            return;
+        }
+
+        try {
+            // URL del microservicio ML (definida en docker-compose)
+            $mlUrl = getenv('ML_API_URL') ?: 'http://ml:8001';
+            $endpoint = $mlUrl . '/extract-pdf';
+
+            // Preparar archivo para enviar con CURL
+            $cfile = new \CURLFile(
+                $_FILES['visaPdf']['tmp_name'], 
+                $_FILES['visaPdf']['type'], 
+                $_FILES['visaPdf']['name']
+            );
+
+            // Iniciar cURL
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $endpoint);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, ['file' => $cfile]);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 30); // Tiempo de espera para OCR (puede ser lento)
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($httpCode === 200 && $response) {
+                $mlData = json_decode($response, true);
+                if (is_array($mlData)) {
+                    // Mapear respuesta ML a nuestra estructura
+                    $out['numeroVisa']            = $mlData['numeroVisa'] ?? '';
+                    $out['visa']                  = $mlData['tipoVisa'] ?? '';
+                    $out['pais']                  = $mlData['pais'] ?? '';
+                    $out['referenciaTransaccion'] = $mlData['referenciaTransaccion'] ?? '';
+                    
+                    // NUEVOS CAMPOS
+                    $out['nombre']    = $mlData['nombre'] ?? '';
+                    $out['apellido']  = $mlData['apellido'] ?? '';
+                    $out['edad']      = $mlData['edad'] ?? 0;
+                    
+                    // Convertir fechas (ej: "20 September 2026" -> "2026-09-20")
+                    if (!empty($mlData['fechaInicio'])) {
+                        $out['fechaInicio'] = self::isoDate($mlData['fechaInicio']);
+                    }
+                    if (!empty($mlData['fechaFinal'])) {
+                        $out['fechaFinal']  = self::isoDate($mlData['fechaFinal']);
+                    }
+                }
+            } else {
+                error_log("ML Service Error ($httpCode): $curlError");
+                // Fallback: Si falla ML, podríamos intentar local (opcional), 
+                // pero por ahora devolvemos vacío para no confundir.
+            }
+
+        } catch (\Throwable $e) {
+            error_log('previewVisaPdf(): ' . $e->getMessage());
+        }
+
         echo json_encode($out);
-        return;
     }
-
-    try {
-        // Extraemos texto plano del PDF
-        $txt = (new Parser())->parseFile($_FILES['visaPdf']['tmp_name'])->getText();
-
-
-        // Patrones de extracción
-        $patGrantNum     = '/Visa grant number\s+([0-9A-Z]+)/i';
-        $patGrantDate    = '/Date of grant\s+([0-9]{1,2}\s+[A-Za-z]+\s+[0-9]{4})/i';
-        $patFinalDate    = '/must not arrive after\s+([0-9]{1,2}\s+[A-Za-z]+\s+[0-9]{4})/i';
-        $patVisaApp      = '/Application status.*?\R\s*([^\n:]+?):/is';
-        $patVisaOld      = '/^Visa\s+(.+)$/mi';
-        $patReferencia   = '/Transaction reference number\s+([A-Z0-9]+)/i'; // ✅ ajuste perfecto
-
-        // Extracción de datos
-        if (preg_match($patGrantNum, $txt, $m))     $out['numeroVisa'] = $m[1];
-        if (preg_match($patGrantDate, $txt, $m))    $out['fechaInicio'] = self::isoDate($m[1]);
-        if (preg_match($patFinalDate, $txt, $m))    $out['fechaFinal']  = self::isoDate($m[1]);
-
-        if (preg_match($patVisaApp, $txt, $m)) {
-            $out['visa'] = trim($m[1]);
-        } elseif (preg_match($patVisaOld, $txt, $m)) {
-            $out['visa'] = trim($m[1]);
-        }
-
-        if (preg_match($patReferencia, $txt, $m)) {
-            $out['referenciaTransaccion'] = trim($m[1]); // ✅ referencia exacta
-        }
-
-        $out['passportCountry'] = self::extractPassportCountry($txt);
-
-    } catch (\Throwable $e) {
-        error_log('previewVisaPdf(): ' . $e->getMessage());
-    }
-
-    echo json_encode($out);
-}
 
 
     /**
@@ -378,13 +404,58 @@ class PersonaController
         );
     }
 
-    /** Enviar e-mail usando Mailgun. */
+    /** Enviar e-mail usando Mailgun con plantilla moderna. */
     public function sendEmail(int $id, string $mail, int $dias, string $name): void
     {
+        // Intentar obtener datos completos de la persona para la plantilla
+        $persona = null;
+        if ($id > 0) {
+            $db = Database::connect();
+            $stmt = $db->prepare(
+                "SELECT nombre, apellido, numeroVisa, tipoVisa, fechaFinal 
+                 FROM personas 
+                 WHERE id = :id"
+            );
+            $stmt->execute([':id' => $id]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            // Solo usar si realmente encontró la persona
+            if ($result !== false) {
+                $persona = $result;
+            }
+        }
+        
+        // Si no se encontró la persona o ID es 0, usar datos de los parámetros
+        if (!$persona) {
+            // Separar nombre completo en nombre y apellido
+            $nameParts = explode(' ', $name, 2);
+            $persona = [
+                'nombre' => $nameParts[0] ?? $name,
+                'apellido' => $nameParts[1] ?? '',
+                'numeroVisa' => 'N/A',
+                'tipoVisa' => 'N/A',
+                'fechaFinal' => 'N/A'
+            ];
+        }
+        
+        // Preparar datos para la plantilla (con null coalescing por seguridad)
+        $templateData = [
+            'nombre' => $persona['nombre'] ?? 'Usuario',
+            'apellido' => $persona['apellido'] ?? '',
+            'dias_restantes' => $dias,
+            'fecha_final' => $persona['fechaFinal'] ?? 'N/A',
+            'numero_visa' => $persona['numeroVisa'] ?? 'N/A',
+            'tipo_visa' => $persona['tipoVisa'] ?? 'N/A'
+        ];
+        
+        // Generar HTML usando la plantilla moderna
+        $htmlBody = \App\Services\EmailTemplates::visaExpiration($templateData);
+        
+        // Enviar correo
         (new EmailService())->send(
             $mail,
-            "Recordatorio Visa – {$dias} días restantes",
-            "<p>Hola {$name}, te quedan <strong>{$dias} días</strong> para renovar tu visa.</p>"
+            "Notificación de Vencimiento de Visa – {$dias} días restantes",
+            $htmlBody
         );
     }
 }

@@ -2,8 +2,8 @@ Application status
 Student (subclass 500): 	Granted 
  
  
-Dear Gabriel Esteban VARGAS MORENO 
-We have granted you a Student (subclass 500) visa on 25 February 2023. 
+Dear Jhonatan Camilo MARTINEZ BELLO 
+We have granted you a Student (subclass 500) visa on 30 January 2023. 
  
 Visa conditions 
 8105 - Work limitation 
@@ -22,36 +22,40 @@ VEVO to identify each condition that applies to this Student (subclass 500) visa
  
 Visa duration and travel 
  
-Date of grant 	25 February 2025 
+Date of grant 	29 January 2024 
  
-Must not arrive after 22 January 2026 
-Length of stay 	22 January 2026 
+Stay until 	20 September 2026 
+Must not arrive after 20 September 2026 
  
+Length of stay 	20 September 2026 
 Travel 	Multiple entries 
+ 
 Visa summary 
  
-Name 	Gabriel Esteban VARGAS MORENO 
+Name 	Jhonatan Camilo MARTINEZ BELLO 
  
-Date of birth 	14 October 2002 
+Date of birth 	21 July 2003 
 Visa 	Student (subclass 500) 
  
-Sector 	Independent ELICOS Sector 
-Date of grant 	25 February 2026 
+Sector 	Vocational Education and Training Sector 
+Date of grant 	29 January 2024 
  
-Visa grant number 2009503713509 
+Visa grant number 0149537330300 
 Passport (or other travel 
 document) number 
-Passport (or other travel 
-document) country 
-BA323515 
-COLOMBIA
+AX712439
 
 - 2 - 
  
  
  
-Application ID 	1540663846 
-Transaction reference number EGOW47KCYA 
+Passport (or other travel 
+document) country 
+COLOMBIA 
+ 
+ 
+Application ID 	940662425 
+Transaction reference number EGOVZNN3Q1 
  
 Why keep this notice? 
 ● Employers and other government agencies might ask for details in this notice so they 
@@ -215,9 +219,9 @@ Translating Service.
 More information: translating.homeaffairs.gov.au 
  
 Yours sincerely 
- 
- 
+Samantha 
+Position Number: 00004258 
 Department of Home Affairs 
  
 Sent to: andinoeducation@gmail.com 
-Sent on: 25 February 2023
+Sent on: 30 January 2023

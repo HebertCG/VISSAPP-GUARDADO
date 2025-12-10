@@ -12,6 +12,11 @@ import joblib
 import numpy as np
 from datetime import datetime
 import os
+import pytesseract
+from PIL import Image
+import io
+import re
+from fastapi import File, UploadFile
 
 # Inicializar FastAPI
 app = FastAPI(
@@ -249,14 +254,242 @@ async def predecir_riesgo_batch(personas: List[PersonaInput]):
                 "recomendacion": f"Error: {str(e)}"
             })
     
+    
     return resultados
+
+
+@app.post("/extract-data")
+async def extract_data_from_image(file: UploadFile = File(...)):
+    """
+    Extrae texto de una imagen y busca patrones de pasaporte/visa.
+    """
+    try:
+        # 1. Leer imagen
+        contents = await file.read()
+        image = Image.open(io.BytesIO(contents))
+        
+        # 2. OCR con Tesseract
+        text = pytesseract.image_to_string(image)
+        print(f"📄 Texto extraído:\n{text}")
+        
+        # 3. Procesamiento de texto (Heurística básica)
+        # Esto es un ejemplo y debería mejorarse con más patrones
+        data = {
+            "nombre": "",
+            "apellido": "",
+            "numeroVisa": "",
+            "raw_text": text
+        }
+        
+        # Buscar patrón de Pasaporte/Visa (ejemplo simplificado)
+        # P<COLAPELLIDO<<NOMBRE<<<<<<<<<<<<<<<<<<<<<<
+        mrz_pattern = r"P<([A-Z]{3})([A-Z]+)<<([A-Z]+)"
+        match = re.search(mrz_pattern, text)
+        if match:
+            data["pais"] = match.group(1)
+            data["apellido"] = match.group(2).replace('<', ' ').strip()
+            data["nombre"] = match.group(3).replace('<', ' ').strip()
+            
+        # Buscar algo que parezca número de visa (Patrón genérico)
+        # Generalmente 8-10 caracteres alfanuméricos
+        visa_pattern = r"\b([A-Z0-9]{8,10})\b"
+        # Filtramos palabras comunes
+        words = re.findall(visa_pattern, text)
+        for w in words:
+            if not w.isalpha() and not w.isdigit(): # Mezcla letras y numeros
+                data["numeroVisa"] = w
+                break
+
+        return data
+        
+    except Exception as e:
+        print(f"Error OCR: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+from pdf2image import convert_from_bytes
+
+@app.post("/extract-pdf")
+async def extract_data_from_pdf(file: UploadFile = File(...)):
+    """
+    Extrae texto de un archivo PDF completo (todas las páginas) usando OCR.
+    """
+    try:
+        # 1. Leer PDF en memoria
+        content = await file.read()
+        
+        # 2. Convertir PDF a imágenes - OPTIMIZADO
+        # DPI reducido de 300 a 150 para velocidad (suficiente para texto)
+        # Solo primeras 2 páginas (datos personales están en página 1)
+        images = convert_from_bytes(
+            content, 
+            dpi=150,  # Reducido para velocidad
+            first_page=1,
+            last_page=2  # Solo primeras 2 páginas
+        )
+        
+        full_text = ""
+        
+        # 3. Procesar cada página
+        for i, image in enumerate(images):
+            # OCR en español e inglés
+            text = pytesseract.image_to_string(image, lang='eng+spa')
+            full_text += f"\n--- Page {i+1} ---\n{text}"
+            
+        print(f"📄 Texto PDF extraído ({len(full_text)} caracteres)")
+        
+        # DEBUG: Guardar texto extraído para análisis
+        with open('/app/debug_ocr_output.txt', 'w', encoding='utf-8') as f:
+            f.write(full_text)
+        print("💾 Texto guardado en /app/debug_ocr_output.txt")
+        
+        # 4. Extracción de datos con Regex (Migrado desde PHP para mayor inteligencia)
+        data = {
+            "nombre": "",
+            "apellido": "",
+            "numeroVisa": "",
+            "fechaInicio": "",
+            "fechaFinal": "",
+            "referenciaTransaccion": "",
+            "tipoVisa": "Student (subclass 500)",
+            "pais": "",
+            "edad": 0,
+            "raw_text": full_text
+        }
+        
+        # 1. Nombre completo - MEJORADO
+        # Busca líneas que contengan solo nombres (palabras capitalizadas)
+        # Formato típico: "Gabriel Esteban VARGAS MORENO" o similar
+        lines = full_text.split('\n')
+        
+        # Limpiar espacios extra que el OCR introduce (ej: "J honatan" -> "Jhonatan")
+        cleaned_lines = []
+        for line in lines:
+            # Eliminar espacios entre letra mayúscula y minúscula
+            cleaned = re.sub(r'([A-Z])\s+([a-z])', r'\1\2', line)
+            cleaned_lines.append(cleaned)
+        
+        for i, line in enumerate(cleaned_lines):
+            if 'Name' in line:
+                # Primero intentar extraer de la misma línea
+                # Formato: "Name Gabriel Esteban VARGAS MORENO"
+                m = re.search(r'Name\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+([A-Z]+(?:\s+[A-Z]+)*)', line)
+                if m:
+                    data["nombre"] = m.group(1).strip()
+                    data["apellido"] = m.group(2).strip()
+                    break
+                # Si no está en la misma línea, buscar en la siguiente
+                elif i + 1 < len(cleaned_lines):
+                    next_line = cleaned_lines[i + 1].strip()
+                    m = re.match(r'^([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+([A-Z]+(?:\s+[A-Z]+)*)$', next_line)
+                    if m:
+                        data["nombre"] = m.group(1).strip()
+                        data["apellido"] = m.group(2).strip()
+                        break
+        
+        # 2. Fecha de nacimiento y cálculo de edad - MEJORADO
+        for i, line in enumerate(cleaned_lines):
+            if 'Date of birth' in line or 'birth' in line.lower():
+                # Buscar en la misma línea o siguiente
+                combined = line + ' ' + (cleaned_lines[i+1] if i+1 < len(cleaned_lines) else '')
+                # Limpiar espacios en meses (ej: "J uly" -> "July")
+                combined = re.sub(r'([A-Z])\s+([a-z]{2,})', r'\1\2', combined)
+                m_dob = re.search(r'(\d{1,2})\s*([A-Za-z]+)\s+(\d{4})', combined)
+                if m_dob:
+                    dob_str = f"{m_dob.group(1)} {m_dob.group(2)} {m_dob.group(3)}"
+                    try:
+                        from datetime import datetime
+                        dob = datetime.strptime(dob_str, "%d %B %Y")
+                        today = datetime.now()
+                        age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+                        data["edad"] = age
+                        break
+                    except:
+                        pass
+        
+        # 3. Visa Grant Number - MEJORADO
+        for i, line in enumerate(cleaned_lines):
+            if 'grant number' in line.lower() or 'Visa grant' in line:
+                combined = line + ' ' + (cleaned_lines[i+1] if i+1 < len(cleaned_lines) else '')
+                m = re.search(r'(\d{10,15})', combined)
+                if m:
+                    data["numeroVisa"] = m.group(1)
+                    break
+            
+        # 4. Fechas de visa - MEJORADO
+        for i, line in enumerate(cleaned_lines):
+            if 'Date of grant' in line:
+                combined = line + ' ' + (cleaned_lines[i+1] if i+1 < len(cleaned_lines) else '')
+                combined = re.sub(r'([A-Z])\s+([a-z]{2,})', r'\1\2', combined)
+                m = re.search(r'(\d{1,2})\s*([A-Za-z]+)\s+(\d{4})', combined)
+                if m:
+                    data["fechaInicio"] = f"{m.group(1)} {m.group(2)} {m.group(3)}"
+                    break
+        
+        for i, line in enumerate(cleaned_lines):
+            if 'not arrive after' in line or 'Must not arrive' in line:
+                combined = line + ' ' + (cleaned_lines[i+1] if i+1 < len(cleaned_lines) else '')
+                combined = re.sub(r'([A-Z])\s+([a-z]{2,})', r'\1\2', combined)
+                m = re.search(r'(\d{1,2})\s*([A-Za-z]+)\s+(\d{4})', combined)
+                if m:
+                    data["fechaFinal"] = f"{m.group(1)} {m.group(2)} {m.group(3)}"
+                    break
+            
+        # 5. Transaction Reference Number - MEJORADO
+        for i, line in enumerate(cleaned_lines):
+            if 'Transaction' in line or 'reference number' in line.lower():
+                combined = line + ' ' + (cleaned_lines[i+1] if i+1 < len(cleaned_lines) else '')
+                m = re.search(r'([A-Z]{2,}[0-9]{2,}[A-Z0-9]+)', combined)
+                if m:
+                    data["referenciaTransaccion"] = m.group(1)
+                    break
+            
+        # 6. País - MEJORADO
+        for i, line in enumerate(cleaned_lines):
+            if 'Passport' in line and 'travel' in line:
+                # El país puede estar en la misma línea o en las siguientes
+                # Formato común: "Passport (or other travel COLOMBIA"
+                # O: "document) country" en una línea y "COLOMBIA" en la siguiente
+                
+                # Intentar extraer de la misma línea primero
+                m = re.search(r'travel\s+([A-Z]{4,})', line)
+                if m:
+                    data["pais"] = m.group(1).strip()
+                    break
+                
+                # Si no, buscar en las siguientes 3 líneas
+                for j in range(1, 4):
+                    if i + j < len(cleaned_lines):
+                        candidate = cleaned_lines[i+j].strip()
+                        # País suele estar en mayúsculas y ser solo letras
+                        if candidate.isupper() and len(candidate) > 3 and candidate.isalpha():
+                            data["pais"] = candidate
+                            break
+                if data["pais"]:
+                    break
+        
+        # 7. Tipo de Visa
+        m_visa_type = re.search(r'Student \(subclass \d+\)', full_text, re.IGNORECASE)
+        if m_visa_type:
+            data["tipoVisa"] = m_visa_type.group(0)
+        
+        print(f"✅ Datos extraídos: Nombre={data['nombre']}, Apellido={data['apellido']}, País={data['pais']}, Edad={data['edad']}, Visa={data['numeroVisa']}")
+        
+        return data
+
+    except Exception as e:
+        print(f"❌ Error procesando PDF: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":
     import uvicorn
     
     print("🚀 Iniciando API de Predicción de Riesgo de Visas...")
-    print("📖 Documentación disponible en: http://localhost:8001/docs")
+    print("📖 Documentación disponible en: http://localhost:8001")
     
     uvicorn.run(
         "app:app",

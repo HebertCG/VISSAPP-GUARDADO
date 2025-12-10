@@ -18,6 +18,15 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Instalar dependencias
+# Instalar dependencias del sistema (incluyendo Tesseract y Poppler)
+RUN apt-get update && apt-get install -y \
+    tesseract-ocr \
+    tesseract-ocr-spa \
+    libtesseract-dev \
+    poppler-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instalar dependencias de Python
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar código de la aplicación

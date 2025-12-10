@@ -79,7 +79,8 @@ class DatabaseTest extends TestCase
      */
     public function usuarios_table_exists(): void
     {
-        $stmt = $this->db->query("SHOW TABLES LIKE 'usuarios'");
+        $stmt = $this->db->prepare("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = :table");
+        $stmt->execute(['table' => 'usuarios']);
         $result = $stmt->fetch();
         
         $this->assertNotFalse(
@@ -93,7 +94,8 @@ class DatabaseTest extends TestCase
      */
     public function personas_table_exists(): void
     {
-        $stmt = $this->db->query("SHOW TABLES LIKE 'personas'");
+        $stmt = $this->db->prepare("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = :table");
+        $stmt->execute(['table' => 'personas']);
         $result = $stmt->fetch();
         
         $this->assertNotFalse(
@@ -107,7 +109,8 @@ class DatabaseTest extends TestCase
      */
     public function notifications_table_exists(): void
     {
-        $stmt = $this->db->query("SHOW TABLES LIKE 'notifications'");
+        $stmt = $this->db->prepare("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = :table");
+        $stmt->execute(['table' => 'notifications']);
         $result = $stmt->fetch();
         
         $this->assertNotFalse(
@@ -121,7 +124,8 @@ class DatabaseTest extends TestCase
      */
     public function usuarios_table_has_required_columns(): void
     {
-        $stmt = $this->db->query("DESCRIBE usuarios");
+        $stmt = $this->db->prepare("SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = :table");
+        $stmt->execute(['table' => 'usuarios']);
         $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
         
         $requiredColumns = ['id', 'usuario', 'password', 'correo', 'rol'];
@@ -140,13 +144,14 @@ class DatabaseTest extends TestCase
      */
     public function personas_table_has_required_columns(): void
     {
-        $stmt = $this->db->query("DESCRIBE personas");
+        $stmt = $this->db->prepare("SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = :table");
+        $stmt->execute(['table' => 'personas']);
         $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
         
         $requiredColumns = [
             'id', 'nombre', 'apellido', 'pais', 'correo', 
-            'telefono', 'edad', 'numeroVisa', 'tipoVisa', 
-            'fechaInicio', 'fechaFinal'
+            'telefono', 'edad', 'numerovisa', 'tipovisa', 
+            'fechainicio', 'fechafinal'
         ];
         
         foreach ($requiredColumns as $column) {
